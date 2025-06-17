@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enterra — B2B-платформа нового поколения</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: radial-gradient(circle at top right, #0f001f, #000420);
+      color: white;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 2.5rem;
+    }
+
+    .buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      gap: 1rem;
+      text-align: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-button {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .cta-button:hover {
+      background: white;
+      color: #111;
+    }
+
+    .cta-button.gradient {
+      background: linear-gradient(270deg, #0044ff, #009dff, #9000ff);
+      background-size: 600% 600%;
+      animation: gradientFlow 20s ease infinite;
+      color: white;
+    }
+
+    .form-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgb(0 0 0 / 82%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.form-container.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+form {
+  background: #1515158c;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+form h3 {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: #2222228f;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+}
+
+.form-group img {
+  width: 22px;
+  height: 22px;
+  opacity: 0.75;
+}
+
+.form-group input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1rem;
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+form button {
+  background: linear-gradient(90deg, #00c8ff87, #6f00ff82);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+form button:hover {
+  background: white;
+  color: #000;
+}
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 1.8rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      .cta-button{
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <header class="header">
+      <h1>Enterra — B2B-платформа нового поколения</h1>
+      <p class="subtitle">Цифровая сеть для бизнеса, стартапов и инвесторов.<br>Находи проверенных партнёров, заключай сделки онлайн, расти быстрее.</p>
+      <div class="buttons">
+        <a href="./index2.html" class="cta-button gradient">Подробнее</a>
+        <button class="cta-button" onclick="window.location.href='https://docs.google.com/forms/d/e/1FAIpQLSdLJYlygyOsbXT4KZghQSH-9cipIQBzuiwfIa2cUUWQcP4XJg/viewform?usp=header'">👉 Мне интересно</button>
+      </div>
+    </header>
+
+    <div class="form-container" id="formOverlay" onclick="hideForm(event)">
+      <form action="https://forms.gle/your-google-form-id" target="_blank" onclick="event.stopPropagation()">
+        <h3>Оставить заявку</h3>
+    
+        <div class="form-group">
+          <img src="./img/User_alt_light@3x.png" alt="ФИО">
+          <input type="text" placeholder="ФИО" required>
+        </div>
+    
+        <div class="form-group">
+          <img src="./img/icons8-поставить-ссылку-на-родительскую-компанию-100.png" alt="Компания / Стартап / Инвестор">
+          <input type="text" placeholder="Компания / Стартап / Инвестор" required>
+        </div>
+    
+        <div class="form-group">
+          <img src="./img/icons8-бизнес-96.png" alt="Сфера деятельности">
+          <input type="text" placeholder="Сфера деятельности" required>
+        </div>
+    
+        <div class="form-group">
+          <img src="./img/icons8-контакты-100.png" alt="Контакт">
+          <input type="text" placeholder="Контакт (WhatsApp / Instagram)" required>
+        </div>
+    
+        <button type="submit">Оставить заявку</button>
+      </form>
+    </div>
+    
+  </div>
+
+  <script>
+    function hideForm(e) {
+      document.getElementById('formOverlay').classList.remove('show');
+    }
+  </script>
+</body>
+</html>
