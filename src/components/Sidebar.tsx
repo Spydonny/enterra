@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Home,
   Newspaper,
@@ -8,9 +8,16 @@ import {
   UserRound
 } from "lucide-react";
 
-type SidebarProps = { route: string; onNavigate: (r: string) => void };
+type SidebarProps = { 
+  route: string; 
+  onNavigate: (r: string) => void;
+  isLoggedIn?: boolean; // <-- добавили
+};
 
-export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate, isLoggedIn=true }) => {
+  const [open, setOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+
   const items = [
     { key: "home", label: "Главная", icon: <Home size={18} /> },
     { key: "profile", label: "Профиль", icon: <UserRound size={18} /> },
@@ -18,6 +25,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate }) => {
     { key: "messages", label: "Сообщения", icon: <MessageSquare size={18} /> },
     { key: "docs", label: "Документы", icon: <FileText size={18} /> },
   ];
+
+  // закрывать по клику вне
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <aside
@@ -28,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate }) => {
       "
     >
       {/* User block */}
-      <div className="p-6 flex items-center gap-3 border-b border-gray-200">
+      <div className="relative p-6 flex items-center gap-3 border-b border-gray-200">
         <img
           src="/avatar.jpg"
           className="w-12 h-12 rounded-full object-cover"
@@ -39,7 +57,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate }) => {
           </div>
           <div className="text-xs text-gray-500">@jane_labadin</div>
         </div>
-        <Settings size={20} className="text-gray-600" />
+
+        {/* Settings button + popover */}
+        <div ref={settingsRef} className="relative">
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="p-1 rounded-lg hover:bg-gray-100"
+          >
+            <Settings size={20} className="text-gray-600" />
+          </button>
+
+          {open && (
+            <div
+              className="
+                absolute right-0 mt-2 w-40 
+                bg-white shadow-md border border-gray-200 
+                rounded-xl p-2 z-20
+              "
+            >
+              <button
+                className="
+                  w-full text-left px-3 py-2 rounded-lg 
+                  hover:bg-gray-100 text-[14px]
+                "
+                onClick={() => {
+                  setOpen(false);
+                  if (isLoggedIn) {
+                    console.log("Logout...");
+                  } else {
+                    console.log("Login...");
+                  }
+                }}
+              >
+                {isLoggedIn ? "Выйти" : "Войти"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Navigation */}
@@ -53,7 +107,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate }) => {
               className={`
                 w-full flex items-center gap-3 px-4 py-3 rounded-lg
                 text-left text-[15px] tracking-wide transition-all duration-150
-
                 ${
                   active
                     ? "bg-gray-100 text-gray-900 font-semibold"
