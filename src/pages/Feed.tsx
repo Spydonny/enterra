@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import type { Post } from "../types";
 
 // 🔹 COMPONENT: PostCard
@@ -59,8 +58,7 @@ const PostCard: React.FC<{ post: Post }> = ({ post }) => {
 };
 
 // 🔹 MAIN FEED PAGE
-export const Feed: React.FC<{ posts: Post[]; onCreate: (t: string) => void }> = ({ posts, onCreate }) => {
-  const [text, setText] = useState("");
+export const Feed: React.FC<{ posts: Post[]; onCreate: (t: string) => void }> = ({ posts }) => {
 
   return (
     <div className="p-10 bg-[#f7f7f5] min-h-screen">
