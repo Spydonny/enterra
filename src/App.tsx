@@ -55,7 +55,7 @@ export const App: React.FC = () => {
     <div className="min-h-screen bg-gray-50 font-sans">
       <Sidebar route={route} onNavigate={setRoute} />
 
-      <main className="ml-64 p-0">
+      <main className="ml-64 p-0"> 
         {route === "home" && (
           <Home
             companies={companies}
