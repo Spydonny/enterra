@@ -12,7 +12,7 @@ export async function loginApi(
   });
 
   const { data } = await api.post<Token>(
-    "/login/access-token",
+    "/api/v1/login/access-token",
     body,
     {
       headers: {
@@ -37,7 +37,7 @@ export async function signupApi(
   payload: SignupPayload
 ): Promise<UserPublic> {
   const { data } = await api.post<UserPublic>(
-    "/users/signup",
+    "/api/v1/users/signup",
     payload
   );
   return data;
@@ -45,7 +45,7 @@ export async function signupApi(
 
 /* ================= TOKEN ================= */
 export async function testToken(): Promise<UserPublic> {
-  const { data } = await api.post<UserPublic>("/login/test-token");
+  const { data } = await api.post<UserPublic>("/api/v1/login/test-token");
   return data;
 }
 
@@ -58,7 +58,7 @@ export async function recoverPassword(
   email: string
 ): Promise<Message> {
   const { data } = await api.post<Message>(
-    `/password-recovery/${email}`
+    `/api/v1/password-recovery/${email}`
   );
   return data;
 }
@@ -68,7 +68,7 @@ export async function resetPassword(
   newPassword: string
 ): Promise<Message> {
   const { data } = await api.post<Message>(
-    "/reset-password/",
+    "/api/v1/reset-password/",
     {
       token,
       new_password: newPassword,
