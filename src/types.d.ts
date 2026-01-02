@@ -29,3 +29,19 @@ subtitle?: string;
 unread?: number;
 messages: { fromMe: boolean; text: string; time: string }[];
 };
+
+export interface Token {
+  access_token: string;
+  token_type?: string;
+}
+
+export interface UserPublic {
+  id: string;
+  email: string;
+  is_active: boolean;
+  is_superuser: boolean;
+}
+
+export interface Message {
+  message: string;
+}

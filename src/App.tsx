@@ -8,9 +8,12 @@ import Documents from "./pages/Documents";
 import { companiesSeed, postsSeed, conversationsSeed } from "./data/seed";
 import { ContractorsPage } from "./pages/ConstractorPage";
 import { StartupInvestorPage } from "./pages/StartupInvestorPage";
+import { Login } from "./pages/auth/Login";
+import { Register } from "./pages/auth/Register";
 
 export const App: React.FC = () => {
-  const [route, setRoute] = React.useState<string>("home");
+  const [route, setRoute] = React.useState<string>("login");
+  const [isAuth, setIsAuth] = React.useState(false);
 
   const [companies] = React.useState(companiesSeed);
   const [posts, setPosts] = React.useState(postsSeed);
@@ -50,6 +53,27 @@ export const App: React.FC = () => {
 
     setActiveConvId(convId);
   }
+
+  if (!isAuth) {
+  if (route === "register") {
+    return (
+      <Register
+        onSuccess={() => setRoute("login")}
+        onGoLogin={() => setRoute("login")}
+      />
+    );
+  }
+
+  return (
+    <Login
+      onSuccess={() => {
+        setIsAuth(true);
+        setRoute("home");
+      }}
+      onGoRegister={() => setRoute("register")}
+    />
+  );
+}
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">

@@ -1,0 +1,78 @@
+import { api } from "./http";
+import type { Token, UserPublic, Message } from "@/types";
+
+/* ================= LOGIN ================= */
+export async function loginApi(
+  email: string,
+  password: string
+): Promise<Token> {
+  const body = new URLSearchParams({
+    username: email,
+    password,
+  });
+
+  const { data } = await api.post<Token>(
+    "/login/access-token",
+    body,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
+
+  localStorage.setItem("access_token", data.access_token);
+  return data;
+}
+
+/* ================= SIGNUP ================= */
+export type SignupPayload = {
+  email: string;
+  password: string;
+  agreed_to_terms: boolean;
+  agreed_to_policy: boolean;
+};
+
+export async function signupApi(
+  payload: SignupPayload
+): Promise<UserPublic> {
+  const { data } = await api.post<UserPublic>(
+    "/users/signup",
+    payload
+  );
+  return data;
+}
+
+/* ================= TOKEN ================= */
+export async function testToken(): Promise<UserPublic> {
+  const { data } = await api.post<UserPublic>("/login/test-token");
+  return data;
+}
+
+export function logout() {
+  localStorage.removeItem("access_token");
+}
+
+/* ================= PASSWORD ================= */
+export async function recoverPassword(
+  email: string
+): Promise<Message> {
+  const { data } = await api.post<Message>(
+    `/password-recovery/${email}`
+  );
+  return data;
+}
+
+export async function resetPassword(
+  token: string,
+  newPassword: string
+): Promise<Message> {
+  const { data } = await api.post<Message>(
+    "/reset-password/",
+    {
+      token,
+      new_password: newPassword,
+    }
+  );
+  return data;
+}
