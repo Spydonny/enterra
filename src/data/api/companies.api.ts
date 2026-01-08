@@ -99,6 +99,8 @@ export interface UserPublic {
    API – Companies
 ======================= */
 
+
+
 export async function getCompanies(
   skip = 0,
   limit = 100
