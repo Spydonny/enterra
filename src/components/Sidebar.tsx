@@ -8,6 +8,7 @@ import {
   UserRound
 } from "lucide-react";
 
+import { logout } from "@/data/api/auth.api";
 import { getMe } from "@/data/api/user.api";
 import { getCompanyByOwnerID } from "@/data/api/companies.api";
 import type { UserPublic, CompanyProfilePublic } from "@/data/api/companies.api";
@@ -122,7 +123,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => {
                   setOpen(false);
                   if (isLoggedIn) {
-                    console.log("Logout...");
+                    logout().then(() => {
+                      window.location.reload();
+                    });
                   } else {
                     console.log("Login...");
                   }

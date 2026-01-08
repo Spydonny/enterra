@@ -51,7 +51,7 @@ export async function testToken(): Promise<UserPublic> {
   return data;
 }
 
-export function logout() {
+export async function logout() {
   localStorage.removeItem("access_token");
 }
 
