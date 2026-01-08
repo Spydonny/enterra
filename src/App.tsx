@@ -3,7 +3,8 @@ import { Sidebar } from "./components/Sidebar";
 import { Home } from "./pages/Home";
 import { Feed } from "./pages/Feed";
 import { Messages } from "./pages/Messages";
-import ProfilePage from "./pages/Profile";
+import { ProfilePage } from "./pages/Profile";
+import { MyCompanyProfilePage } from "./pages/MyProfilePage";
 import Documents from "./pages/Documents";
 import { companiesSeed, postsSeed, conversationsSeed } from "./data/seed";
 import { ContractorsPage } from "./pages/ConstractorPage";
@@ -196,6 +197,10 @@ export const App: React.FC = () => {
             onMessage={(id: string) => handleContact(id)}
             isYourSelf={false}
           />
+        )}
+
+        {route === "profile-me" && (
+          <MyCompanyProfilePage />
         )}
 
         {route === "docs" && <Documents />}
