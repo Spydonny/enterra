@@ -124,7 +124,7 @@ export async function getCompanyByOwnerID(owner_id : UUID): Promise<CompanyProfi
 export async function createCompany(
   payload: CompanyCreate
 ): Promise<CompanyPublic> {
-  const { data } = await api.post("/api/v1/companies", payload);
+  const { data } = await api.post("/api/v1/companies/", payload);
   return data;
 }
 
