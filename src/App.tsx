@@ -10,10 +10,14 @@ import { ContractorsPage } from "./pages/ConstractorPage";
 import { StartupInvestorPage } from "./pages/StartupInvestorPage";
 import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
+import { CreateCompany } from "./pages/auth/CreateCompanies";
+
+import { getMe } from "./data/api/user.api";
 
 export const App: React.FC = () => {
   const [route, setRoute] = React.useState<string>("login");
-  const [isAuth, setIsAuth] = React.useState(false);
+  const [isAuth, setIsAuth] = React.useState<boolean | null>(null);
+  const [hasCompany, setHasCompany] = React.useState(false);
 
   const [companies] = React.useState(companiesSeed);
   const [posts, setPosts] = React.useState(postsSeed);
@@ -54,26 +58,76 @@ export const App: React.FC = () => {
     setActiveConvId(convId);
   }
 
-  if (!isAuth) {
-  if (route === "register") {
+  React.useEffect(() => {
+  async function checkAuth() {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      setIsAuth(false);
+      return;
+    }
+
+    try {
+      await getMe();
+
+      setIsAuth(true);
+      setHasCompany(true); // или me.company !== null
+      setRoute("home");
+    } catch (e) {
+      localStorage.removeItem("access_token");
+      setIsAuth(false);
+    }
+  }
+
+  checkAuth();
+}, []);
+
+  if (isAuth === null) {
     return (
-      <Register
-        onSuccess={() => setRoute("login")}
-        onGoLogin={() => setRoute("login")}
+      <div className="h-screen flex items-center justify-center">
+        Загрузка...
+      </div>
+    );
+  }
+
+  if (!isAuth) {
+    if (route === "register") {
+      return (
+        <Register
+          onSuccess={() => setRoute("create-company")}
+          onGoLogin={() => setRoute("login")}
+        />
+      );
+    }
+
+    if (route === "create-company") {
+      return (
+        <CreateCompany
+          onSuccess={() => {
+            setHasCompany(true);
+            setIsAuth(true);
+            setRoute("home");
+          }}
+        />
+      );
+    }
+
+    return (
+      <Login
+        onSuccess={() => {
+          setIsAuth(true);
+
+          if (!hasCompany) {
+            setRoute("create-company");
+          } else {
+            setRoute("home");
+          }
+        }}
+        onGoRegister={() => setRoute("register")}
       />
     );
   }
 
-  return (
-    <Login
-      onSuccess={() => {
-        setIsAuth(true);
-        setRoute("home");
-      }}
-      onGoRegister={() => setRoute("register")}
-    />
-  );
-}
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">

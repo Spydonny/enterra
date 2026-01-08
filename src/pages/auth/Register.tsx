@@ -1,10 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   registerSchema,
   type RegisterDTO,
 } from "@/validation/authSchemas";
-import { signupApi } from "@/data/api/auth.api";
+import { signupApi, loginApi } from "@/data/api/auth.api";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { AuthLogo } from "@/components/AuthLogo";
 
@@ -29,9 +30,13 @@ export const Register = ({
     await signupApi({
       email: data.email,
       password: data.password,
+      full_name: `${data.firstName} ${data.lastName}`,
       agreed_to_terms: data.agreement,
       agreed_to_policy: data.agreement,
     });
+
+    await loginApi(data.email, data.password);
+
 
     onSuccess();
   };
@@ -43,17 +48,77 @@ export const Register = ({
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="space-y-4"
+        noValidate
       >
+        {/* Имя + Фамилия */}
         <div className="grid grid-cols-2 gap-3">
-          <input {...register("firstName")} placeholder="Имя" className="input" />
-          <input {...register("lastName")} placeholder="Фамилия" className="input" />
+          <div>
+            <input
+              {...register("firstName")}
+              placeholder="Имя"
+              className={`input ${errors.firstName ? "input-error" : ""}`}
+            />
+            {errors.firstName && (
+              <p className="error-text">{errors.firstName.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("lastName")}
+              placeholder="Фамилия"
+              className={`input ${errors.lastName ? "input-error" : ""}`}
+            />
+            {errors.lastName && (
+              <p className="error-text">{errors.lastName.message}</p>
+            )}
+          </div>
         </div>
 
-        <input {...register("email")} placeholder="Email" className="input" />
-        <input {...register("password")} type="password" placeholder="Пароль" className="input" />
-        <input {...register("confirmPassword")} type="password" placeholder="Подтвердите пароль" className="input" />
+        {/* Email */}
+        <div>
+          <input
+            {...register("email")}
+            placeholder="Email"
+            className={`input ${errors.email ? "input-error" : ""}`}
+          />
+          {errors.email && (
+            <p className="error-text">{errors.email.message}</p>
+          )}
+        </div>
 
-        <label className="flex gap-2 text-sm">
+        {/* Пароль */}
+        <div>
+          <input
+            {...register("password")}
+            type="password"
+            placeholder="Пароль"
+            className={`input ${errors.password ? "input-error" : ""}`}
+          />
+          {errors.password && (
+            <p className="error-text">{errors.password.message}</p>
+          )}
+        </div>
+
+        {/* Подтверждение пароля */}
+        <div>
+          <input
+            {...register("confirmPassword")}
+            type="password"
+            placeholder="Подтвердите пароль"
+            className={`input ${
+              errors.confirmPassword ? "input-error" : ""
+            }`}
+          />
+          {errors.confirmPassword && (
+            <p className="error-text">
+              {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
+
+        {/* Agreement */}
+        <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" {...register("agreement")} />
           Согласен с обработкой данных
         </label>
@@ -62,11 +127,13 @@ export const Register = ({
           <p className="error-text">{errors.agreement.message}</p>
         )}
 
+        {/* Submit */}
         <button
+          type="submit"
           className="btn-primary w-full"
           disabled={isSubmitting}
         >
-          Создать аккаунт
+          {isSubmitting ? "Создание..." : "Создать аккаунт"}
         </button>
       </form>
 

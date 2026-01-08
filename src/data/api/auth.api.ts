@@ -29,6 +29,8 @@ export async function loginApi(
 export type SignupPayload = {
   email: string;
   password: string;
+  full_name?: string;
+  company_id?: string;
   agreed_to_terms: boolean;
   agreed_to_policy: boolean;
 };

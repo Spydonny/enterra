@@ -8,15 +8,27 @@ import {
   UserRound
 } from "lucide-react";
 
+import { getMe } from "@/data/api/user.api";
+import { getCompanyByOwnerID } from "@/data/api/companies.api";
+import type { UserPublic, CompanyProfilePublic } from "@/data/api/companies.api";
+
 type SidebarProps = { 
   route: string; 
   onNavigate: (r: string) => void;
-  isLoggedIn?: boolean; // <-- добавили
+  isLoggedIn?: boolean;
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate, isLoggedIn=true }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  route,
+  onNavigate,
+  isLoggedIn = true
+}) => {
   const [open, setOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
+
+  // 🔽 добавлено (логика)
+  const [user, setUser] = useState<UserPublic | null>(null);
+  const [company, setCompany] = useState<CompanyProfilePublic | null>(null);
 
   const items = [
     { key: "home", label: "Главная", icon: <Home size={18} /> },
@@ -37,6 +49,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate, isLoggedIn=
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // 🔽 загрузка данных
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    async function load() {
+      try {
+        const me = await getMe();
+        setUser(me);
+
+        try {
+          const company = await getCompanyByOwnerID(me.id);
+          setCompany(company);
+        } catch {
+          setCompany(null);
+        }
+      } catch {
+        setUser(null);
+        setCompany(null);
+      }
+    }
+
+    load();
+  }, [isLoggedIn]);
+
   return (
     <aside
       className="
@@ -48,14 +84,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ route, onNavigate, isLoggedIn=
       {/* User block */}
       <div className="relative p-6 flex items-center gap-3 border-b border-gray-200">
         <img
-          src="/avatar.jpg"
+          src={company?.logo_url ?? "/company-logo-placeholder.png"}
           className="w-12 h-12 rounded-full object-cover"
         />
         <div className="flex-1">
           <div className="text-[15px] font-semibold text-gray-900">
-            Jane Labadin
+            {user?.full_name ?? user?.email ?? "—"}
           </div>
-          <div className="text-xs text-gray-500">@jane_labadin</div>
+          {/*Company name */}
+          <div className="text-xs text-gray-500">
+            {company?.name ?? "Компания не создана"}
+          </div> 
         </div>
 
         {/* Settings button + popover */}
