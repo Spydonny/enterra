@@ -6,7 +6,7 @@ import { Messages } from "./pages/Messages";
 import { ProfilePage } from "./pages/Profile";
 import { MyCompanyProfilePage } from "./pages/MyProfilePage";
 import Documents from "./pages/Documents";
-import { companiesSeed, postsSeed, conversationsSeed } from "./data/seed";
+import { companiesSeed, conversationsSeed } from "./data/seed";
 import { ContractorsPage } from "./pages/ConstractorPage";
 import { StartupInvestorPage } from "./pages/StartupInvestorPage";
 import { Login } from "./pages/auth/Login";
@@ -21,7 +21,6 @@ export const App: React.FC = () => {
   const [hasCompany, setHasCompany] = React.useState(false);
 
   const [companies] = React.useState(companiesSeed);
-  const [posts, setPosts] = React.useState(postsSeed);
   const [conversations, setConversations] = React.useState(conversationsSeed);
   const [activeConvId, setActiveConvId] = React.useState(
     conversationsSeed[0]?.id ?? ""
