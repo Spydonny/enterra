@@ -10,16 +10,18 @@ status: string;
 };
 
 
+// src/types/post.ts
 export type Post = {
-id: number;
-author: string;
-role?: string;
-time: string;
-text: string;
-likes: number;
-comments: number;
-image?: string | null;
+  id: string;
+  author_id: string;
+  company_id?: string | null;
+  content: string;
+  media_urls?: string | null;
+  created_at: string;
+  comments_count: number;
+  reactions_count: number;
 };
+
 
 
 export type Conversation = {
@@ -46,3 +48,5 @@ export interface UserPublic {
 export interface Message {
   message: string;
 }
+
+export type UUID = string;

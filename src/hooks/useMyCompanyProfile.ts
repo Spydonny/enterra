@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getCompanyByOwnerID } from "@/data/api/companies.api";
-
 export const useMyCompanyProfile = (ownerId?: string) => {
   const [company, setCompany] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);

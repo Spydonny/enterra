@@ -166,20 +166,6 @@ export const App: React.FC = () => {
 
         {route === "feed" && (
           <Feed
-            posts={posts}
-            onCreate={(text) =>
-              setPosts((s) => [
-                {
-                  id: Date.now(),
-                  author: "Вы",
-                  time: "только что",
-                  text,
-                  likes: 0,
-                  comments: 0,
-                },
-                ...s,
-              ])
-            }
           />
         )}
 

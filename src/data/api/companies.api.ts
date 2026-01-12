@@ -2,11 +2,7 @@
 
 import { api } from "./http";
 
-/* =======================
-   Shared
-======================= */
-
-export type UUID = string;
+import type { UUID } from "@/types.d.ts";
 
 /* =======================
    Company
@@ -16,6 +12,9 @@ export interface CompanyBase {
   name: string;
   description?: string | null;
   logo_url?: string | null;
+  email?: string | null;
+  address?: string | null;
+  phone_number?: string | null;
 }
 
 export interface CompanyCreate extends CompanyBase {}
@@ -24,6 +23,9 @@ export interface CompanyUpdate {
   name?: string | null;
   description?: string | null;
   logo_url?: string | null;
+  email?: string | null;
+  address?: string | null;
+  phone_number?: string | null;
 }
 
 export interface CompanyPublic extends CompanyBase {
@@ -98,8 +100,6 @@ export interface UserPublic {
 /* =======================
    API – Companies
 ======================= */
-
-
 
 export async function getCompanies(
   skip = 0,

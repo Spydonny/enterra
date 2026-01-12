@@ -3,7 +3,7 @@ import {
   Home,
   Newspaper,
   MessageSquare,
-  FileText,
+  // FileText,
   Settings,
   UserRound
 } from "lucide-react";
@@ -36,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { key: "profile-me", label: "Мой профиль", icon: <UserRound size={18} /> },
     { key: "feed", label: "Лента новостей", icon: <Newspaper size={18} /> },
     { key: "messages", label: "Сообщения", icon: <MessageSquare size={18} /> },
-    { key: "docs", label: "Документы", icon: <FileText size={18} /> },
+    // { key: "docs", label: "Документы", icon: <FileText size={18} /> },
   ];
 
   // закрывать по клику вне

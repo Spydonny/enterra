@@ -46,13 +46,32 @@ export const Home: React.FC<Props> = ({
       </div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-3 gap-8 mt-8">
+      <div
+        className="
+          grid
+          gap-5
+          mt-1
+          justify-center
+          [grid-template-columns:repeat(auto-fit,minmax(360px,1fr))]
+        "
+      >
         {companies.map((c) => (
-          <div key={c.id} onClick={() => onOpenProfile(c)}>
+          <div
+            key={c.id}
+            onClick={() => onOpenProfile(c)}
+            className="
+              relative
+              w-[360px]
+              h-[220px]
+              cursor-pointer
+            "
+          >
             <CompanyCard company={c} onContact={onContact} />
           </div>
         ))}
       </div>
+
+
     </div>
   );
 };

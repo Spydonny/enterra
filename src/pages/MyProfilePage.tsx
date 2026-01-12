@@ -1,13 +1,51 @@
 import { useState } from "react";
-import { Star, Mail, MapPin, Globe, ChevronRight } from "lucide-react";
+import { Star, Mail, MapPin, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyCompanyProfile } from "@/hooks/useMyCompanyProfile";
 import type { CompanyMemberPublic } from "@/data/api/companies.api";
+import { updateCompany } from "@/data/api/companies.api";
+import type { CompanyUpdate } from "@/data/api/companies.api";
+
 
 export const MyCompanyProfilePage = () => {
   const { user } = useAuth();
   const { company, isLoading, error } = useMyCompanyProfile(user?.id);
   const [tab, setTab] = useState<"pub" | "cases" | "reviews">("pub");
+  const [isEditing, setIsEditing] = useState(false);
+  const [formState, setFormState] = useState<CompanyUpdate>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleEdit = () => {
+    setFormState({
+      name: company.name ?? null,
+      description: company.description ?? null,
+      email: company.email ?? null,
+      address: company.address ?? null,
+      phone_number: company.phone_number ?? null,
+      logo_url: company.logo_url ?? null,
+    });
+    console.log(formState);
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+  console.log("Saving", formState);
+  try {
+    setIsSaving(true);
+
+    const updatedCompany = await updateCompany(company.id, formState);
+    console.log("Updated company:", updatedCompany);
+    
+
+    setIsEditing(false);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+
 
   if (isLoading) return <p>Загрузка…</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -40,13 +78,31 @@ export const MyCompanyProfilePage = () => {
 
           {/* Owner buttons */}
           <div className="flex gap-2">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow">
-              Редактировать
-            </button>
-            <button className="px-4 py-2 bg-red-500 text-white rounded-lg shadow">
-              Удалить
-            </button>
+            {!isEditing ? (
+              <button
+                onClick={handleEdit}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow"
+              >
+                Редактировать
+              </button>
+            ) : (
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg shadow disabled:opacity-50"
+              >
+                {isSaving ? "Сохранение…" : "Сохранить"}
+              </button>
+            )}
           </div>
+          {isEditing && (
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-sm text-gray-500"
+            >
+              Отмена
+            </button>
+          )}
         </div>
 
         {/* Tabs */}
@@ -137,21 +193,57 @@ export const MyCompanyProfilePage = () => {
             <div className="bg-white rounded-xl shadow p-4">
               <div className="font-semibold text-lg mb-2">О компании</div>
 
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {company.description || "Описание отсутствует."}
-              </p>
+              {isEditing ? (
+                <textarea
+                  value={formState.description ?? ""}
+                  onChange={(e) =>
+                    setFormState((s) => ({ ...s, description: e.target.value }))
+                  }
+                  className="w-full border rounded-lg p-2 text-sm"
+                  rows={4}
+                />
+              ) : (
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {company.description || "Описание отсутствует."}
+                </p>
+              )}
 
               <div className="mt-4 space-y-2 text-sm text-gray-700">
-                {company.email && (
-                  <div className="flex gap-2 items-center">
-                    <Mail size={16} /> {company.email}
-                  </div>
+                {isEditing ? (
+                  <input
+                    type="email"
+                    value={formState.email ?? ""}
+                    onChange={(e) =>
+                      setFormState((s) => ({ ...s, email: e.target.value }))
+                    }
+                    className="w-full border rounded-lg p-2 text-sm"
+                    placeholder="Email"
+                  />
+                ) : (
+                  company.email && (
+                    <div className="flex gap-2 items-center">
+                      <Mail size={16} /> {company.email}
+                    </div>
+                  )
                 )}
-                {company.address && (
-                  <div className="flex gap-2 items-center">
-                    <MapPin size={16} /> {company.address}
-                  </div>
-                )}
+
+                {isEditing ? (
+                    <input
+                      value={formState.address ?? ""}
+                      onChange={(e) =>
+                        setFormState((s) => ({ ...s, address: e.target.value }))
+                      }
+                      className="w-full border rounded-lg p-2 text-sm"
+                      placeholder="Адрес"
+                    />
+                  ) : (
+                    company.address && (
+                      <div className="flex gap-2 items-center">
+                        <MapPin size={16} /> {company.address}
+                      </div>
+                    )
+                  )}
+
                 {company.created_at && (
                   <div className="flex gap-2 items-center">
                     <Globe size={16} /> Основана:{" "}
@@ -160,9 +252,9 @@ export const MyCompanyProfilePage = () => {
                 )}
               </div>
 
-              <button className="mt-3 text-blue-600 text-sm flex items-center gap-1">
+              {/* <button className="mt-3 text-blue-600 text-sm flex items-center gap-1">
                 Показать больше <ChevronRight size={16} />
-              </button>
+              </button> */}
             </div>
 
             {/* Tags */}
