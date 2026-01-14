@@ -1,4 +1,4 @@
-// src/api/posts.api.ts
+// src/api/feed.api.ts
 
 import { api } from "./http"; // axios instance
 import type { UUID } from "@/types.d.ts";

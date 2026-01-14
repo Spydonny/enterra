@@ -5,6 +5,7 @@ import { useMyCompanyProfile } from "@/hooks/useMyCompanyProfile";
 import type { CompanyMemberPublic } from "@/data/api/companies.api";
 import { updateCompany } from "@/data/api/companies.api";
 import type { CompanyUpdate } from "@/data/api/companies.api";
+import { ProfilePost } from "./ProfilePost";
 
 
 export const MyCompanyProfilePage = () => {
@@ -130,9 +131,7 @@ export const MyCompanyProfilePage = () => {
           {/* Left content */}
           <div className="flex-1 space-y-6">
             {tab === "pub" && (
-              <div className="bg-white rounded-xl shadow p-4">
-                Публикации компании появятся здесь.
-              </div>
+              <ProfilePost />
             )}
 
             {tab === "cases" && (
@@ -204,8 +203,15 @@ export const MyCompanyProfilePage = () => {
                 />
               ) : (
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  {company.description || "Описание отсутствует."}
-                </p>
+                    {company.description
+                      ?.split("\n")
+                      .map((line: string, i: number) => (
+                        <span key={i}>
+                          {line}
+                          <br />
+                        </span>
+                      ))}
+                  </p>
               )}
 
               <div className="mt-4 space-y-2 text-sm text-gray-700">
