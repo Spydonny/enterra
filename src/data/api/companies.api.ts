@@ -15,9 +15,10 @@ export interface CompanyBase {
   email?: string | null;
   address?: string | null;
   phone_number?: string | null;
+  company_type?: "startup" | "investor" | "contractor" | "executor" | null;
 }
 
-export interface CompanyCreate extends CompanyBase {}
+export interface CompanyCreate extends CompanyBase { }
 
 export interface CompanyUpdate {
   name?: string | null;
@@ -26,6 +27,7 @@ export interface CompanyUpdate {
   email?: string | null;
   address?: string | null;
   phone_number?: string | null;
+  company_type?: "startup" | "investor" | "contractor" | "executor" | null;
 }
 
 export interface CompanyPublic extends CompanyBase {
@@ -118,7 +120,7 @@ export async function getCompany(
   return data;
 }
 
-export async function getCompanyByOwnerID(owner_id : UUID): Promise<CompanyProfilePublic> {
+export async function getCompanyByOwnerID(owner_id: UUID): Promise<CompanyProfilePublic> {
   const { data } = await api.get<CompanyProfilePublic>(`/api/v1/companies/owner/${owner_id}`);
   return data;
 }

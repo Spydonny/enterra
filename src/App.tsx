@@ -1,30 +1,25 @@
 import React from "react";
 import { Sidebar } from "./components/Sidebar";
-import { Home } from "./pages/Home";
+import { Home } from "./pages/main/Home";
 import { Feed } from "./pages/Feed";
 import { Messages } from "./pages/Messages";
 import { ProfilePage } from "./pages/profile/Profile";
 import { MyCompanyProfilePage } from "./pages/profile/MyProfilePage";
 import Documents from "./pages/Documents";
-import { companiesSeed, conversationsSeed } from "./data/seed";
-import { ContractorsPage } from "./pages/ConstractorPage";
-import { StartupInvestorPage } from "./pages/StartupInvestorPage";
+import { ContractorsPage } from "./pages/main/ConstractorPage";
+import { StartupInvestorPage } from "./pages/main/StartupInvestorPage";
 import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import { CreateCompany } from "./pages/auth/CreateCompanies";
 
 import { getMe } from "./data/api/user.api";
+import { chatsApi } from "./data/api/chats.api";
 
 export const App: React.FC = () => {
   const [route, setRoute] = React.useState<string>("login");
   const [isAuth, setIsAuth] = React.useState<boolean | null>(null);
   const [hasCompany, setHasCompany] = React.useState(false);
 
-  const [companies] = React.useState(companiesSeed);
-  const [conversations, setConversations] = React.useState(conversationsSeed);
-  const [activeConvId, setActiveConvId] = React.useState(
-    conversationsSeed[0]?.id ?? ""
-  );
 
   const [selectedCompany, setSelectedCompany] = React.useState<any>(null);
 
@@ -33,54 +28,43 @@ export const App: React.FC = () => {
     setRoute("profile");
   }
 
-  function handleContact(id: string) {
-    setRoute("messages");
+  async function handleContact(companyOwnerId: string) {
+    try {
+      // Create or get chat with this company owner
+      await chatsApi.createChat(companyOwnerId);
 
-    const convId = `c-${id}`;
-
-    setConversations((prev) => {
-      const exists = prev.find((c) => c.id === convId);
-      if (exists) return prev;
-
-      const company = companies.find((x) => x.id === id);
-      return [
-        ...prev,
-        {
-          id: convId,
-          title: company?.leader || "Контакт",
-          subtitle: company ? `${company.type}` : undefined,
-          unread: 0,
-          messages: [],
-        },
-      ];
-    });
-
-    setActiveConvId(convId);
+      // Navigate to messages page - Messages component will load the chat list
+      setRoute("messages");
+    } catch (err) {
+      console.error("Failed to create chat:", err);
+      // Still navigate to messages page to show existing chats
+      setRoute("messages");
+    }
   }
 
   React.useEffect(() => {
-  async function checkAuth() {
-    const token = localStorage.getItem("access_token");
+    async function checkAuth() {
+      const token = localStorage.getItem("access_token");
 
-    if (!token) {
-      setIsAuth(false);
-      return;
+      if (!token) {
+        setIsAuth(false);
+        return;
+      }
+
+      try {
+        await getMe();
+
+        setIsAuth(true);
+        setHasCompany(true); // или me.company !== null
+        setRoute("home");
+      } catch (e) {
+        localStorage.removeItem("access_token");
+        setIsAuth(false);
+      }
     }
 
-    try {
-      await getMe();
-
-      setIsAuth(true);
-      setHasCompany(true); // или me.company !== null
-      setRoute("home");
-    } catch (e) {
-      localStorage.removeItem("access_token");
-      setIsAuth(false);
-    }
-  }
-
-  checkAuth();
-}, []);
+    checkAuth();
+  }, []);
 
   if (isAuth === null) {
     return (
@@ -133,10 +117,9 @@ export const App: React.FC = () => {
     <div className="min-h-screen bg-gray-50 font-sans">
       <Sidebar route={route} onNavigate={setRoute} />
 
-      <main className="ml-64 p-0"> 
+      <main className="ml-64 p-0">
         {route === "home" && (
           <Home
-            companies={companies}
             onContact={handleContact}
             onNavigate={setRoute}
             onOpenProfile={openProfile}
@@ -145,10 +128,6 @@ export const App: React.FC = () => {
 
         {route === "contractors" && (
           <ContractorsPage
-            services={companies.filter(
-              (c) => c.type === "service" || c.type === "executor"
-            )}
-            contractors={companies.filter((c) => c.type === "contractor")}
             onContact={handleContact}
             onBack={() => setRoute("home")}
           />
@@ -156,8 +135,6 @@ export const App: React.FC = () => {
 
         {route === "startup-investor" && (
           <StartupInvestorPage
-            startups={companies.filter((c) => c.type === "startup")}
-            investors={companies.filter((c) => c.type === "investor")}
             onContact={handleContact}
             onBack={() => setRoute("home")}
           />
@@ -168,13 +145,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {route === "messages" && (
-          <Messages
-            conversations={conversations}
-            activeId={activeConvId}
-            setActiveId={setActiveConvId}
-          />
-        )}
+        {route === "messages" && <Messages />}
 
         {route === "profile" && (
           <ProfilePage

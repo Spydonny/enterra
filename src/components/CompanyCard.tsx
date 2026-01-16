@@ -1,12 +1,17 @@
 import React from "react";
-import type { Company } from "../types";
+import type { CompanyPublic } from "@/data/api/companies.api";
 
 type Props = {
-  company: Company;
+  company: CompanyPublic;
   onContact: (id: string) => void;
 };
 
 export const CompanyCard: React.FC<Props> = ({ company, onContact }) => {
+  const handleContactClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onContact(company.id);
+  };
+
   return (
     <div
       className="
@@ -33,9 +38,18 @@ export const CompanyCard: React.FC<Props> = ({ company, onContact }) => {
             flex items-center justify-center
             text-sm text-gray-600
             shrink-0
+            overflow-hidden
           "
         >
-          Фото
+          {company.logo_url ? (
+            <img
+              src={company.logo_url}
+              alt={company.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            "Фото"
+          )}
         </div>
 
         <div className="flex-1">
@@ -46,66 +60,37 @@ export const CompanyCard: React.FC<Props> = ({ company, onContact }) => {
                 {company.name}
               </div>
 
-              <div className="text-sm text-gray-500 mt-0.5">
-                {company.type}
-              </div>
-            </div>
-
-            <div className="text-right shrink-0">
-              <div className="text-sm font-medium text-yellow-600 leading-none">
-                ★★★★★ {company.ratingUsers}
-              </div>
-
-              <div className="text-xs text-gray-500 mt-0.5">
-                Enterra: {company.ratingEnterra}/10
-              </div>
+              {company.company_type && (
+                <div className="text-sm text-gray-500 mt-0.5 capitalize">
+                  {company.company_type}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Leader */}
-          <div className="mt-3 text-sm text-gray-700">
-            Руководитель: <b>{company.leader}</b>
-          </div>
+          {/* Description */}
+          {company.description && (
+            <div className="mt-3 text-sm text-gray-600 line-clamp-2">
+              {company.description}
+            </div>
+          )}
 
-          {/* Tags */}
-          <div className="mt-3 flex gap-2 flex-wrap">
-            {company.tags.map((t) => (
-              <span
-                key={t}
-                className="
-                  text-xs px-2.5 py-1
-                  rounded-full
-                  bg-gray-100
-                  border border-gray-200
-                "
-              >
-                {t}
-              </span>
-            ))}
-
-            <span
-              className={`
-                text-xs px-2.5 py-1 rounded-full border
-                ${
-                  company.status === "свободен"
-                    ? "bg-green-50 border-green-200 text-green-700"
-                    : company.status === "в процессе сделки"
-                    ? "bg-orange-50 border-orange-200 text-orange-700"
-                    : "bg-blue-50 border-blue-200 text-blue-700"
-                }
-              `}
-            >
-              {company.status}
-            </span>
-          </div>
+          {/* Contact info */}
+          {(company.email || company.phone_number) && (
+            <div className="mt-3 text-xs text-gray-500 space-y-1">
+              {company.email && <div>📧 {company.email}</div>}
+              {company.phone_number && <div>📞 {company.phone_number}</div>}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 🔥 Bottom actions */}
+      {/* Bottom actions */}
       <div className="mt-auto pt-5 flex gap-3">
         <button
-          onClick={() => onContact(company.id)}
+          onClick={handleContactClick}
           className="
+          
             flex-1
             py-2.5
             bg-blue-600 hover:bg-blue-700
@@ -136,4 +121,3 @@ export const CompanyCard: React.FC<Props> = ({ company, onContact }) => {
     </div>
   );
 };
-

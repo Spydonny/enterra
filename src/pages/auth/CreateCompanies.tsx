@@ -76,6 +76,54 @@ export const CreateCompany = ({ onSuccess }: CreateCompanyProps) => {
           className="input"
         />
 
+        {/* Company Type Radio Buttons */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            Тип компании
+          </label>
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="startup"
+                {...register("company_type")}
+                className="w-4 h-4"
+              />
+              <span>Startup</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="Investor"
+                {...register("company_type")}
+                className="w-4 h-4"
+              />
+              <span>Investor</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="contractor"
+                {...register("company_type")}
+                className="w-4 h-4"
+              />
+              <span>Contractor</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                value="executor"
+                {...register("company_type")}
+                className="w-4 h-4"
+              />
+              <span>Executor</span>
+            </label>
+          </div>
+          {errors.company_type && (
+            <p className="error-text">{errors.company_type.message}</p>
+          )}
+        </div>
+
         <input type="hidden" {...register("logo_url")} />
 
         {/* Upload logo */}
