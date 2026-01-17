@@ -55,13 +55,13 @@ export const chatsApi = {
     /* -------- Chats -------- */
 
     createChat(participantId: string) {
-        return api.post<ChatPublic>(API_BASE, null, {
+        return api.post<ChatPublic>(API_BASE + "/", null, {
             params: { participant_id: participantId },
         });
     },
 
     getChats(params?: { skip?: number; limit?: number }) {
-        return api.get<ChatsPublic>(API_BASE, { params });
+        return api.get<ChatsPublic>(API_BASE + "/", { params });
     },
 
     /* -------- Messages -------- */
@@ -75,7 +75,7 @@ export const chatsApi = {
         params?: { skip?: number; limit?: number }
     ) {
         return api.get<ChatMessagesPublic>(
-            `${API_BASE}/${chatId}/messages`,
+            `${API_BASE}/${chatId}/messages/`,
             { params }
         );
     },
