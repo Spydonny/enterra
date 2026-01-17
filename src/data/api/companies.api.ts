@@ -107,7 +107,7 @@ export async function getCompanies(
   skip = 0,
   limit = 100
 ): Promise<CompaniesPublic> {
-  const { data } = await api.get("/api/v1/companies", {
+  const { data } = await api.get("/api/v1/companies/", {
     params: { skip, limit },
   });
   return data;
