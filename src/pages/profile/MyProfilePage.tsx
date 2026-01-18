@@ -30,21 +30,21 @@ export const MyCompanyProfilePage = () => {
   };
 
   const handleSave = async () => {
-  console.log("Saving", formState);
-  try {
-    setIsSaving(true);
+    console.log("Saving", formState);
+    try {
+      setIsSaving(true);
 
-    const updatedCompany = await updateCompany(company.id, formState);
-    console.log("Updated company:", updatedCompany);
-    
+      const updatedCompany = await updateCompany(company.id, formState);
+      console.log("Updated company:", updatedCompany);
 
-    setIsEditing(false);
-  } catch (e) {
-    console.error(e);
-  } finally {
-    setIsSaving(false);
-  }
-};
+
+      setIsEditing(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
 
 
@@ -111,18 +111,17 @@ export const MyCompanyProfilePage = () => {
           {["pub", "cases", "reviews"].map((t) => (
             <button
               key={t}
-              className={`px-3 py-2 ${
-                tab === t
+              className={`px-3 py-2 ${tab === t
                   ? "text-blue-600 font-semibold border-b-2 border-blue-600"
                   : "text-gray-600"
-              }`}
+                }`}
               onClick={() => setTab(t as any)}
             >
               {t === "pub"
                 ? "Публикации"
                 : t === "cases"
-                ? "Кейсы"
-                : "Отзывы"}
+                  ? "Кейсы"
+                  : "Отзывы"}
             </button>
           ))}
         </div>
@@ -183,7 +182,12 @@ export const MyCompanyProfilePage = () => {
               <div className="flex items-center gap-2">
                 <Star className="text-yellow-400 fill-yellow-400" size={20} />
                 <div className="text-lg font-semibold">
-                  {company.rating ?? "—"}
+                  {company.average_rating
+                    ? company.average_rating.toFixed(1)
+                    : "—"}
+                </div>
+                <div className="text-sm text-gray-500">
+                  ({company.ratings?.length ?? 0} отзывов)
                 </div>
               </div>
             </div>
@@ -203,15 +207,15 @@ export const MyCompanyProfilePage = () => {
                 />
               ) : (
                 <p className="text-sm text-gray-600 leading-relaxed">
-                    {company.description
-                      ?.split("\n")
-                      .map((line: string, i: number) => (
-                        <span key={i}>
-                          {line}
-                          <br />
-                        </span>
-                      ))}
-                  </p>
+                  {company.description
+                    ?.split("\n")
+                    .map((line: string, i: number) => (
+                      <span key={i}>
+                        {line}
+                        <br />
+                      </span>
+                    ))}
+                </p>
               )}
 
               <div className="mt-4 space-y-2 text-sm text-gray-700">
@@ -234,21 +238,21 @@ export const MyCompanyProfilePage = () => {
                 )}
 
                 {isEditing ? (
-                    <input
-                      value={formState.address ?? ""}
-                      onChange={(e) =>
-                        setFormState((s) => ({ ...s, address: e.target.value }))
-                      }
-                      className="w-full border rounded-lg p-2 text-sm"
-                      placeholder="Адрес"
-                    />
-                  ) : (
-                    company.address && (
-                      <div className="flex gap-2 items-center">
-                        <MapPin size={16} /> {company.address}
-                      </div>
-                    )
-                  )}
+                  <input
+                    value={formState.address ?? ""}
+                    onChange={(e) =>
+                      setFormState((s) => ({ ...s, address: e.target.value }))
+                    }
+                    className="w-full border rounded-lg p-2 text-sm"
+                    placeholder="Адрес"
+                  />
+                ) : (
+                  company.address && (
+                    <div className="flex gap-2 items-center">
+                      <MapPin size={16} /> {company.address}
+                    </div>
+                  )
+                )}
 
                 {company.created_at && (
                   <div className="flex gap-2 items-center">

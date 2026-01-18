@@ -9,7 +9,7 @@ type Props = {
 export const CompanyCard: React.FC<Props> = ({ company, onContact }) => {
   const handleContactClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onContact(company.id);
+    onContact(company.owner_id);
   };
 
   return (

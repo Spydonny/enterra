@@ -33,23 +33,23 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
 
           {/* Buttons */}
           {isYourSelf ? (
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow">
-                Редактировать профиль
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow">
+              Редактировать профиль
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                className="px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm"
+                onClick={() => onMessage(company?.id)}
+              >
+                Сообщение
               </button>
-            ) : (
-              <div className="flex gap-2">
-                <button
-                  className="px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm"
-                  onClick={() => onMessage(company?.id)}
-                >
-                  Сообщение
-                </button>
 
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow">
-                  Подписаться
-                </button>
-              </div>
-            )}
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow">
+                Подписаться
+              </button>
+            </div>
+          )}
 
         </div>
 
@@ -59,11 +59,10 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
           {["pub", "cases", "reviews"].map((t) => (
             <button
               key={t}
-              className={`px-3 py-2 ${
-                tab === t
-                  ? "text-blue-600 font-semibold border-b-2 border-blue-600"
-                  : "text-gray-600"
-              }`}
+              className={`px-3 py-2 ${tab === t
+                ? "text-blue-600 font-semibold border-b-2 border-blue-600"
+                : "text-gray-600"
+                }`}
               onClick={() => setTab(t)}
             >
               {t === "pub" ? "Публикации" : t === "cases" ? "Кейсы" : "Отзывы"}
@@ -99,8 +98,14 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
             <div className="bg-white rounded-xl shadow p-4">
               <div className="flex items-center gap-2">
                 <Star className="text-yellow-400 fill-yellow-400" size={20} />
-                <div className="text-lg font-semibold">4.9</div>
-                <div className="text-sm text-gray-500">(28 отзывов)</div>
+                <div className="text-lg font-semibold">
+                  {company?.average_rating
+                    ? company.average_rating.toFixed(1)
+                    : "—"}
+                </div>
+                <div className="text-sm text-gray-500">
+                  ({company?.ratings?.length ?? 0} отзывов)
+                </div>
               </div>
             </div>
 
