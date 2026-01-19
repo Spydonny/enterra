@@ -6,6 +6,7 @@ import type { CompanyMemberPublic } from "@/data/api/companies.api";
 import { updateCompany } from "@/data/api/companies.api";
 import type { CompanyUpdate } from "@/data/api/companies.api";
 import { ProfilePost } from "./ProfilePost";
+// import { addCompanyMember, type CompanyRole } from "@/data/api/companies.api";
 
 
 export const MyCompanyProfilePage = () => {
@@ -15,6 +16,10 @@ export const MyCompanyProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formState, setFormState] = useState<CompanyUpdate>({});
   const [isSaving, setIsSaving] = useState(false);
+  // const [newMemberId, setNewMemberId] = useState("");
+  // const [newMemberRole, setNewMemberRole] = useState<CompanyRole>("member");
+  // const [isAddingMember, setIsAddingMember] = useState(false);
+
 
   const handleEdit = () => {
     setFormState({
@@ -45,6 +50,30 @@ export const MyCompanyProfilePage = () => {
       setIsSaving(false);
     }
   };
+
+  // const handleAddMember = async () => {
+  //   if (!newMemberId) return;
+
+  //   try {
+  //     setIsAddingMember(true);
+
+  //     const member = await addCompanyMember(company.id, {
+  //       user_id: newMemberId,
+  //       role: newMemberRole,
+  //     });
+
+  //     // ⚠️ если company из хука — мутировать нельзя
+  //     company.members = [...(company.members ?? []), member];
+
+  //     setNewMemberId("");
+  //     setNewMemberRole("member");
+  //   } catch (e) {
+  //     console.error(e);
+  //     alert("Не удалось добавить участника");
+  //   } finally {
+  //     setIsAddingMember(false);
+  //   }
+  // };
 
 
 
@@ -112,8 +141,8 @@ export const MyCompanyProfilePage = () => {
             <button
               key={t}
               className={`px-3 py-2 ${tab === t
-                  ? "text-blue-600 font-semibold border-b-2 border-blue-600"
-                  : "text-gray-600"
+                ? "text-blue-600 font-semibold border-b-2 border-blue-600"
+                : "text-gray-600"
                 }`}
               onClick={() => setTab(t as any)}
             >

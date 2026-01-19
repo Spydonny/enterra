@@ -4,6 +4,7 @@ import { Star, MapPin, Phone, Mail, Globe, Award, ChevronRight } from "lucide-re
 export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
   const [tab, setTab] = useState("pub");
 
+
   const data = {
     title: company?.name ?? "Неизвестная компания",
     type: company?.type ?? "Тип не указан",

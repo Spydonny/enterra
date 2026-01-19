@@ -54,7 +54,7 @@ export interface CompanyProfilePublic extends CompanyBase {
    Members
 ======================= */
 
-export type CompanyRole = "admin" | "member";
+export type CompanyRole = string;
 
 export interface CompanyMemberPublic {
   user_id: UUID;
