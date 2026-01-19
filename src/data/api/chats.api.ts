@@ -75,7 +75,7 @@ export const chatsApi = {
         params?: { skip?: number; limit?: number }
     ) {
         return api.get<ChatMessagesPublic>(
-            `${API_BASE}/${chatId}/messages/`,
+            `${API_BASE}/${chatId}/messages`,
             { params }
         );
     },
