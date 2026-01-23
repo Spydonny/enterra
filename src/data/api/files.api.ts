@@ -1,4 +1,4 @@
-import { api } from "./http"; // твой уже существующий axios instance
+import { api } from "./http";
 
 /* =======================
    Types
@@ -7,8 +7,9 @@ export interface FileMeta {
   id: string;
   filename: string;
   content_type: string;
-  path: string;
+  path: string;        // GCS public URL
   owner_id: string;
+  created_at: string;
 }
 
 /* =======================
@@ -16,33 +17,48 @@ export interface FileMeta {
 ======================= */
 
 /**
- * Upload file
+ * Upload file to GCS
  */
 export async function uploadFile(file: File): Promise<FileMeta> {
   const formData = new FormData();
   formData.append("file", file);
 
-  const { data } = await api.post<FileMeta>("/api/v1/files/upload", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const { data } = await api.post<FileMeta>(
+    "/api/v1/files/upload",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 
   return data;
 }
 
 /**
- * Download file by id
- * Возвращает Blob, который можно сохранить через a.download
+ * Download file (attachment)
  */
 export async function downloadFile(fileId: string): Promise<Blob> {
-  const response = await api.get(`/api/v1/files/${fileId}`, {
-    responseType: "blob",
-  });
+  const { data } = await api.get(
+    `/api/v1/files/download/${fileId}`,
+    { responseType: "blob" }
+  );
 
-  return response.data;
+  return data;
 }
 
-export function getFileUrl(fileId: string) {
-  return `${import.meta.env.VITE_API_URL}/api/v1/static/uploads/${fileId}`;
+/**
+ * Preview file (inline)
+ * Например для <img />, <iframe />, <object />
+ */
+export function getPreviewUrl(fileId: string): string {
+  return `${import.meta.env.VITE_API_URL}/api/v1/files/preview/${fileId}`;
+}
+
+/**
+ * Direct GCS public URL (если нужен)
+ */
+export function getPublicFileUrl(meta: FileMeta): string {
+  return meta.path;
 }

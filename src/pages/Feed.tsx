@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { postsApi } from "@/data/api/feed.api";
 import { getUserById } from "@/data/api/user.api";
 import { getCompany } from "@/data/api/companies.api";
+import { type CompanyBase } from "@/data/api/companies.api";
 
 
 export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
@@ -11,7 +12,7 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
   const [authorName, setAuthorName] = useState<string>(
     `User ${post.author_id.slice(0, 6)}`
   );
-  const [companyName, setCompanyName] = useState<string | null>(null);
+  const [company, setCompany] = useState<CompanyBase | null>(null);
 
   // 🔹 ДОБАВЛЕНО: подгрузка реальных данных
   useEffect(() => {
@@ -19,15 +20,18 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
       .then((user) => {
         setAuthorName(user.full_name ?? user.email);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     if (post.company_id) {
       getCompany(post.company_id)
         .then((company) => {
-          setCompanyName(company.name);
+          setCompany(company);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
+
+    console.log(post.company_id);
+
   }, [post.author_id, post.company_id]);
 
   return (
@@ -39,7 +43,13 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-full bg-gray-200" />
+          {company?.logo_url && (
+            <img
+              src={company.logo_url}
+              alt="Логотип компании"
+              className="w-16 h-16 rounded-full bg-gray-300 border-4 border-white shadow-md"
+            />
+          )}
 
           <div>
             <div className="flex items-center gap-2">
@@ -49,9 +59,9 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
               </span>
 
               {/* 🔹 КОМПАНИЯ — ТОЛЬКО ТЕКСТ ЗАМЕНЁН */}
-              {post.company_id && companyName && (
+              {post.company_id && company?.name && (
                 <span className="px-2 py-0.5 text-xs bg-blue-600 text-white rounded-md">
-                  {companyName}
+                  {company.name}
                 </span>
               )}
             </div>

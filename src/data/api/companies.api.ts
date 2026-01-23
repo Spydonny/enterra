@@ -24,6 +24,7 @@ export interface CompanyUpdate {
   name?: string | null;
   description?: string | null;
   logo_url?: string | null;
+  logo_file_id?: string | null;
   email?: string | null;
   address?: string | null;
   phone_number?: string | null;

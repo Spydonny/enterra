@@ -5,7 +5,7 @@ import { getCompanies, type CompanyPublic } from "@/data/api/companies.api";
 type Props = {
   onContact: (id: string) => void;
   onNavigate: (route: string) => void;
-  onOpenProfile: (company: CompanyPublic) => void;
+  onOpenProfile: (company_id: string) => void;
 };
 
 export const Home: React.FC<Props> = ({
@@ -93,7 +93,7 @@ export const Home: React.FC<Props> = ({
           {companies.map((c) => (
             <div
               key={c.id}
-              onClick={() => onOpenProfile(c)}
+              onClick={() => onOpenProfile(c.id)}
               className="
                 relative
                 w-[360px]

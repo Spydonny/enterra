@@ -21,10 +21,10 @@ export const App: React.FC = () => {
   const [hasCompany, setHasCompany] = React.useState(false);
 
 
-  const [selectedCompany, setSelectedCompany] = React.useState<any>(null);
+  const [selectedCompanyId, setSelectedCompanyId] = React.useState<string>("");
 
-  function openProfile(company: any) {
-    setSelectedCompany(company);
+  function openProfile(company_id: string) {
+    setSelectedCompanyId(company_id);
     setRoute("profile");
   }
 
@@ -149,8 +149,8 @@ export const App: React.FC = () => {
 
         {route === "profile" && (
           <ProfilePage
-            company={selectedCompany}
-            onMessage={(id: string) => handleContact(id)}
+            company_id={selectedCompanyId}
+            onMessage={(ownerId: string) => handleContact(ownerId)}
             isYourSelf={false}
           />
         )}

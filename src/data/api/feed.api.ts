@@ -58,6 +58,25 @@ export const postsApi = {
     return data;
   },
 
+  getPostById: async (postId: UUID) => {
+    const { data } = await api.get<Post>(
+      `/${API_BASE}/posts/${postId}`
+    );
+    return data;
+  },
+
+  getCompanyPosts: async (
+    companyId: UUID,
+    params?: { skip?: number; limit?: number }
+  ) => {
+    const { data } = await api.get<PostsResponse>(
+      `/${API_BASE}/posts/company/${companyId}`,
+      { params }
+    );
+    return data;
+  },
+
+
   /* ---- COMMENTS ---- */
 
   createComment: async (

@@ -6,7 +6,7 @@ import type { CompanyMemberPublic } from "@/data/api/companies.api";
 import { updateCompany } from "@/data/api/companies.api";
 import type { CompanyUpdate } from "@/data/api/companies.api";
 import { ProfilePost } from "./ProfilePost";
-// import { addCompanyMember, type CompanyRole } from "@/data/api/companies.api";
+import { AddMemberModal } from "@/components/AddMemberModal";
 
 
 export const MyCompanyProfilePage = () => {
@@ -16,9 +16,8 @@ export const MyCompanyProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formState, setFormState] = useState<CompanyUpdate>({});
   const [isSaving, setIsSaving] = useState(false);
-  // const [newMemberId, setNewMemberId] = useState("");
-  // const [newMemberRole, setNewMemberRole] = useState<CompanyRole>("member");
-  // const [isAddingMember, setIsAddingMember] = useState(false);
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [members, setMembers] = useState<CompanyMemberPublic[]>([]);
 
 
   const handleEdit = () => {
@@ -51,29 +50,9 @@ export const MyCompanyProfilePage = () => {
     }
   };
 
-  // const handleAddMember = async () => {
-  //   if (!newMemberId) return;
-
-  //   try {
-  //     setIsAddingMember(true);
-
-  //     const member = await addCompanyMember(company.id, {
-  //       user_id: newMemberId,
-  //       role: newMemberRole,
-  //     });
-
-  //     // ⚠️ если company из хука — мутировать нельзя
-  //     company.members = [...(company.members ?? []), member];
-
-  //     setNewMemberId("");
-  //     setNewMemberRole("member");
-  //   } catch (e) {
-  //     console.error(e);
-  //     alert("Не удалось добавить участника");
-  //   } finally {
-  //     setIsAddingMember(false);
-  //   }
-  // };
+  const handleMemberAdded = (newMember: CompanyMemberPublic) => {
+    setMembers((prev) => [...prev, newMember]);
+  };
 
 
 
@@ -159,7 +138,7 @@ export const MyCompanyProfilePage = () => {
           {/* Left content */}
           <div className="flex-1 space-y-6">
             {tab === "pub" && (
-              <ProfilePost />
+              <ProfilePost company={company} isYourCompany={true} />
             )}
 
             {tab === "cases" && (
@@ -176,11 +155,19 @@ export const MyCompanyProfilePage = () => {
 
             {/* Members */}
             <div className="bg-white rounded-xl shadow p-4">
-              <h3 className="font-semibold mb-3">Участники</h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Участники</h3>
+                <button
+                  onClick={() => setIsAddMemberModalOpen(true)}
+                  className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  + Добавить
+                </button>
+              </div>
 
-              {company.members?.length ? (
+              {(members.length > 0 || company.members?.length) ? (
                 <ul className="space-y-2">
-                  {company.members.map((member: CompanyMemberPublic) => (
+                  {[...(company.members ?? []), ...members].map((member: CompanyMemberPublic) => (
                     <li
                       key={member.user_id}
                       className="flex justify-between text-sm border-b pb-2"
@@ -316,6 +303,14 @@ export const MyCompanyProfilePage = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Member Modal */}
+      <AddMemberModal
+        open={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+        companyId={company.id}
+        onMemberAdded={handleMemberAdded}
+      />
     </div>
   );
 };

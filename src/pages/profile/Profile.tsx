@@ -1,19 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, MapPin, Phone, Mail, Globe, Award, ChevronRight } from "lucide-react";
+import { getCompany, type CompanyProfilePublic } from "@/data/api/companies.api";
+import { ProfilePost } from "./ProfilePost";
 
-export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
+interface ProfilePageProps {
+  company_id: string;
+  onMessage: (ownerId: string) => void;
+  isYourSelf?: boolean;
+}
+
+export function ProfilePage({ company_id, onMessage, isYourSelf = false }: ProfilePageProps) {
   const [tab, setTab] = useState("pub");
+  const [company, setCompany] = useState<CompanyProfilePublic | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    async function loadCompany() {
+      if (!company_id) {
+        setError("Company ID is required");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getCompany(company_id);
+        setCompany(data);
+      } catch (err) {
+        console.error("Failed to load company:", err);
+        setError("Не удалось загрузить данные компании");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadCompany();
+  }, [company_id]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-lg text-gray-600">Загрузка...</div>
+      </div>
+    );
+  }
+
+  if (error || !company) {
+    return (
+      <div className="w-full flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-lg text-red-600">{error || "Компания не найдена"}</div>
+      </div>
+    );
+  }
 
   const data = {
     title: company?.name ?? "Неизвестная компания",
-    type: company?.type ?? "Тип не указан",
+    type: company?.company_type ?? "Тип не указан",
     email: company?.email ?? "—",
-    phone: company?.phone ?? "—",
+    phone: company?.phone_number ?? "—",
     address: company?.address ?? "—",
-    founded: company?.founded ?? "—",
-    tags: company?.tags ?? ["Услуги", "B2B"],
-    achievements: company?.achievements ?? ["Нет данных"],
+    founded: "—", // This field is not in the API response
+    tags: ["Услуги", "B2B"], // This field is not in the API response
+    achievements: ["Нет данных"], // This field is not in the API response
     description: company?.description ?? "",
   };
 
@@ -25,7 +75,13 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
 
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white shadow-md" />
+          {company?.logo_url && (
+            <img
+              src={company.logo_url}
+              alt="Логотип компании"
+              className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white shadow-md"
+            />
+          )}
 
           <div className="flex-1">
             <div className="text-xl font-semibold">{data.title}</div>
@@ -41,7 +97,7 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
             <div className="flex gap-2">
               <button
                 className="px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm"
-                onClick={() => onMessage(company?.id)}
+                onClick={() => onMessage(company?.owner_id)}
               >
                 Сообщение
               </button>
@@ -75,11 +131,8 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
           {/* Left content */}
           <div className="flex-1 space-y-6">
             {tab === "pub" && (
-              <div className="bg-white rounded-xl shadow p-4">
-                Публикации компании появятся здесь.
-              </div>
+              <ProfilePost company={company} isYourCompany={false} />
             )}
-
             {tab === "cases" && (
               <div className="bg-white rounded-xl shadow p-4">
                 Кейсы компании появятся здесь.
@@ -156,7 +209,7 @@ export function ProfilePage({ company, onMessage, isYourSelf = false }: any) {
               <div className="font-semibold mb-3">Услуги</div>
 
               <div className="flex flex-wrap gap-2">
-                {(company?.tags || data.tags).map((tag: string) => (
+                {data.tags.map((tag: string) => (
                   <span
                     key={tag}
                     className="px-3 py-1 rounded-lg bg-gray-100 text-sm"
