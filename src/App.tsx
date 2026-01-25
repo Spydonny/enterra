@@ -69,14 +69,11 @@ export const App: React.FC = () => {
   if (isAuth === null) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="space-y-4 w-96">
-          <div className="animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] h-12 rounded-lg"
-            style={{ animation: "shimmer 1.5s ease-in-out infinite" }} />
-          <div className="animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] h-12 rounded-lg"
-            style={{ animation: "shimmer 1.5s ease-in-out infinite" }} />
-          <div className="animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] h-12 rounded-lg"
-            style={{ animation: "shimmer 1.5s ease-in-out infinite" }} />
-        </div>
+        <img
+          src="/enterra.jpg"
+          alt="Loading"
+          className="w-86"
+        />
       </div>
     );
   }
