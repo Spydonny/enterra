@@ -3,6 +3,7 @@ import { Star, MapPin, Phone, Mail, Globe, Award, ChevronRight } from "lucide-re
 import { getCompany, createOrUpdateRating, type CompanyProfilePublic } from "@/data/api/companies.api";
 import { ProfilePost } from "./ProfilePost";
 import { RatingModal } from "@/components/RatingModal";
+import { type CompanyMemberPublic } from "@/data/api/companies.api";
 
 interface ProfilePageProps {
   company_id: string;
@@ -16,6 +17,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+  const [members] = useState<CompanyMemberPublic[]>([]);
 
   useEffect(() => {
     async function loadCompany() {
@@ -147,6 +149,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
           ))}
         </div>
 
+
         <div className="flex mt-6 gap-6">
           {/* Left content */}
           <div className="flex-1 space-y-6">
@@ -237,6 +240,76 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
                 )}
               </div>
             )}
+
+            {/* Members */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="flex justify-between items-center mb-5">
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900">Команда</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {(members.length > 0 || company.members?.length)
+                      ? `${[...(company.members ?? []), ...members].length} ${[...(company.members ?? []), ...members].length === 1 ? 'участник' : 'участников'}`
+                      : 'Добавьте участников команды'}
+                  </p>
+                </div>
+              </div>
+
+              {(members.length > 0 || company.members?.length) ? (
+                <div className="grid grid-cols-1 gap-3">
+                  {[...(company.members ?? []), ...members].map((member: CompanyMemberPublic) => {
+                    const displayName = member.user?.full_name ?? member.user?.email ?? member.user_id;
+                    const initials = member.user?.full_name
+                      ? member.user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                      : (member.user?.email?.[0] ?? '?').toUpperCase();
+
+                    return (
+                      <div
+                        key={member.user_id}
+                        className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 bg-gradient-to-r from-gray-50 to-white"
+                      >
+                        {/* Avatar */}
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                          {initials}
+                        </div>
+
+                        {/* User Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-gray-900 truncate">
+                            {displayName}
+                          </div>
+                          {member.user?.email && member.user?.full_name && (
+                            <div className="text-xs text-gray-500 truncate">
+                              {member.user.email}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Role Badge */}
+                        <div className="flex-shrink-0">
+                          <span className="px-3 py-1.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full border border-blue-200">
+                            {member.role || 'Участник'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-200 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    Участников пока нет
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Нажмите "Добавить" чтобы пригласить участников
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
