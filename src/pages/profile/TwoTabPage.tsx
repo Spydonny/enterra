@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import type { CompanyPublic } from "@/data/api/companies.api";
+import { CompanyCardSkeleton } from "@/components/Skeleton";
 
 type Props = {
   title: string;
@@ -55,8 +56,8 @@ export const TwoTabsPage: React.FC<Props> = ({
         <button
           onClick={() => setActiveTab("tab1")}
           className={`px-6 py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${activeTab === "tab1"
-              ? "bg-blue-600 text-white shadow"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-blue-600 text-white shadow"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
         >
           {tab1Label}
@@ -65,8 +66,8 @@ export const TwoTabsPage: React.FC<Props> = ({
         <button
           onClick={() => setActiveTab("tab2")}
           className={`px-6 py-2 rounded-lg text-sm font-medium transition-all shadow-sm ${activeTab === "tab2"
-              ? "bg-blue-600 text-white shadow"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-blue-600 text-white shadow"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
         >
           {tab2Label}
@@ -75,8 +76,10 @@ export const TwoTabsPage: React.FC<Props> = ({
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-20">
-          <p className="text-gray-500">Загрузка компаний...</p>
+        <div className="grid grid-cols-3 gap-8">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <CompanyCardSkeleton key={i} />
+          ))}
         </div>
       )}
 

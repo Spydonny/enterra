@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Star, MapPin, Phone, Mail, Globe, Award, ChevronRight } from "lucide-react";
-import { getCompany, type CompanyProfilePublic } from "@/data/api/companies.api";
+import { getCompany, createOrUpdateRating, type CompanyProfilePublic } from "@/data/api/companies.api";
 import { ProfilePost } from "./ProfilePost";
+import { RatingModal } from "@/components/RatingModal";
 
 interface ProfilePageProps {
   company_id: string;
@@ -14,6 +15,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
   const [company, setCompany] = useState<CompanyProfilePublic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadCompany() {
@@ -38,6 +40,24 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
 
     loadCompany();
   }, [company_id]);
+
+  const handleRatingSubmit = async (data: { score: number; comment?: string }) => {
+    if (!company_id) return;
+
+    try {
+      await createOrUpdateRating(company_id, {
+        score: data.score,
+        comment: data.comment || null,
+      });
+
+      // Reload company data to get updated rating
+      const updatedCompany = await getCompany(company_id);
+      setCompany(updatedCompany);
+    } catch (err) {
+      console.error("Failed to submit rating:", err);
+      alert("Не удалось отправить отзыв. Попробуйте снова.");
+    }
+  };
 
   if (loading) {
     return (
@@ -140,8 +160,81 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
             )}
 
             {tab === "reviews" && (
-              <div className="bg-white rounded-xl shadow p-4">
-                Пока нет отзывов.
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="mb-6">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">Отзывы и рейтинги</h3>
+                  <p className="text-sm text-gray-500">
+                    {company?.ratings?.length ?? 0} {(company?.ratings?.length ?? 0) === 1 ? 'отзыв' : 'отзывов'}
+                  </p>
+                </div>
+
+                {company?.ratings && company.ratings.length > 0 ? (
+                  <div className="space-y-4">
+                    {company.ratings.map((rating) => {
+                      const date = new Date(rating.created_at);
+                      const formattedDate = date.toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      });
+
+                      return (
+                        <div
+                          key={rating.id}
+                          className="p-5 rounded-xl border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50"
+                        >
+                          {/* Rating Header */}
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              {/* User Avatar */}
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                U
+                              </div>
+                              <div>
+                                <div className="font-semibold text-gray-900">Пользователь</div>
+                                <div className="text-xs text-gray-500">{formattedDate}</div>
+                              </div>
+                            </div>
+
+                            {/* Stars */}
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  size={18}
+                                  className={
+                                    star <= rating.score
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-gray-300"
+                                  }
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Comment */}
+                          {rating.comment && (
+                            <p className="text-sm text-gray-700 leading-relaxed pl-13">
+                              {rating.comment}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-200 flex items-center justify-center">
+                      <Star className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">
+                      Отзывов пока нет
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Станьте первым, кто оставит отзыв об этой компании
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -150,7 +243,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
           <div className="w-80 space-y-6">
             {/* Rating */}
             <div className="bg-white rounded-xl shadow p-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-3">
                 <Star className="text-yellow-400 fill-yellow-400" size={20} />
                 <div className="text-lg font-semibold">
                   {company?.average_rating
@@ -161,6 +254,15 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
                   ({company?.ratings?.length ?? 0} отзывов)
                 </div>
               </div>
+
+              {!isYourSelf && (
+                <button
+                  onClick={() => setIsRatingModalOpen(true)}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition text-sm"
+                >
+                  Оставить отзыв
+                </button>
+              )}
             </div>
 
             {/* About */}
@@ -222,6 +324,12 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
           </div>
         </div>
       </div>
+
+      <RatingModal
+        open={isRatingModalOpen}
+        onClose={() => setIsRatingModalOpen(false)}
+        onSubmit={handleRatingSubmit}
+      />
     </div>
   );
 }

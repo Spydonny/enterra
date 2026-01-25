@@ -3,6 +3,7 @@ import { ContractModal } from "../components/ContractModel";
 import { chatsApi, type ChatPublic, type ChatMessagePublic } from "@/data/api/chats.api";
 import { getMe } from "@/data/api/user.api";
 import { getCompanyByOwnerID } from "@/data/api/companies.api";
+import { ChatListSkeleton, MessagesSkeleton } from "@/components/Skeleton";
 
 export const Messages: React.FC = () => {
   const [chats, setChats] = useState<ChatPublic[]>([]);
@@ -12,6 +13,7 @@ export const Messages: React.FC = () => {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [messageInput, setMessageInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
   // Chat metadata (user/company names)
   const [chatMetadata, setChatMetadata] = useState<Map<string, { title: string; subtitle?: string }>>(new Map());
@@ -123,14 +125,17 @@ export const Messages: React.FC = () => {
 
   async function sendMessage() {
     const text = messageInput.trim();
-    if (!text || !activeId) return;
+    if (!text || !activeId || isSending) return;
 
     try {
+      setIsSending(true);
       const newMessage = await chatsApi.sendMessage(activeId, { content: text });
       setMessages(prev => [...prev, newMessage.data]);
       setMessageInput("");
     } catch (err) {
       console.error("Failed to send message:", err);
+    } finally {
+      setIsSending(false);
     }
   }
 
@@ -165,9 +170,7 @@ export const Messages: React.FC = () => {
 
         <div className="flex-1 overflow-auto divide-y divide-gray-100">
           {isLoadingChats ? (
-            <div className="p-4 text-center text-gray-500">
-              Загрузка чатов...
-            </div>
+            <ChatListSkeleton />
           ) : chats.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               Нет активных чатов
@@ -260,9 +263,7 @@ export const Messages: React.FC = () => {
             {/* MESSAGES */}
             <div className="flex-1 overflow-auto pr-2 space-y-5">
               {isLoadingMessages ? (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Загрузка сообщений...
-                </div>
+                <MessagesSkeleton />
               ) : messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   Нет сообщений. Начните переписку!
@@ -324,7 +325,7 @@ export const Messages: React.FC = () => {
 
               <button
                 onClick={sendMessage}
-                disabled={!messageInput.trim()}
+                disabled={!messageInput.trim() || isSending}
                 className="
                   px-6 py-3 rounded-xl
                   bg-gradient-to-r from-blue-600 to-blue-700
@@ -332,7 +333,7 @@ export const Messages: React.FC = () => {
                   disabled:opacity-50 disabled:cursor-not-allowed
                 "
               >
-                Отправить
+                {isSending ? "Отправка..." : "Отправить"}
               </button>
             </div>
           </>

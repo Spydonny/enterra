@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CompanyCard } from "@/components/CompanyCard";
 import { getCompanies, type CompanyPublic } from "@/data/api/companies.api";
+import { CompanyCardSkeleton } from "@/components/Skeleton";
 
 type Props = {
   onContact: (id: string) => void;
@@ -67,8 +68,20 @@ export const Home: React.FC<Props> = ({
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-20">
-          <p className="text-gray-500">Загрузка компаний...</p>
+        <div
+          className="
+            grid
+            gap-5
+            mt-1
+            justify-center
+            [grid-template-columns:repeat(auto-fit,minmax(360px,1fr))]
+          "
+        >
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="relative w-[360px] h-[220px]">
+              <CompanyCardSkeleton />
+            </div>
+          ))}
         </div>
       )}
 

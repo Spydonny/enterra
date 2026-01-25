@@ -5,6 +5,7 @@ import { postsApi } from "@/data/api/feed.api";
 import { getUserById } from "@/data/api/user.api";
 import { getCompany } from "@/data/api/companies.api";
 import { type CompanyBase } from "@/data/api/companies.api";
+import { PostCardSkeleton } from "@/components/Skeleton";
 
 
 export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
@@ -137,8 +138,17 @@ export const Feed: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="p-10 text-gray-500 text-sm">
-        Загрузка ленты…
+      <div className="p-10 bg-[#f7f7f5] min-h-screen">
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-3xl font-bold tracking-wide text-gray-900">
+            Лента новостей
+          </h1>
+        </div>
+        <div className="mt-10 space-y-6">
+          <PostCardSkeleton />
+          <PostCardSkeleton />
+          <PostCardSkeleton />
+        </div>
       </div>
     );
   }
