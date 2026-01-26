@@ -83,7 +83,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
     email: company?.email ?? "—",
     phone: company?.phone_number ?? "—",
     address: company?.address ?? "—",
-    founded: "—", // This field is not in the API response
+    founded: new Date(company.created_at).getFullYear() ?? "—",
     tags: ["Услуги", "B2B"], // This field is not in the API response
     achievements: ["Нет данных"], // This field is not in the API response
     description: company?.description ?? "",
@@ -357,7 +357,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
                   <MapPin size={16} /> {data.address}
                 </div>
                 <div className="flex gap-2 items-center">
-                  <Globe size={16} /> Основана: {data.founded}
+                  <Globe size={16} /> В Enterra с: {data.founded}
                 </div>
               </div>
 

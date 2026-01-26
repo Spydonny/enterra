@@ -15,7 +15,7 @@ export interface CompanyBase {
   email?: string | null;
   address?: string | null;
   phone_number?: string | null;
-  company_type?: "startup" | "investor" | "contractor" | "executor" | null;
+  company_type?: string | null;
 }
 
 export interface CompanyCreate extends CompanyBase { }

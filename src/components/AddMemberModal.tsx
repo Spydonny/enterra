@@ -90,7 +90,7 @@ export const AddMemberModal: React.FC<Props> = ({
                     {/* Email Input */}
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Email <span className="text-red-500">*</span>
+                            Email участника <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="email"
@@ -104,7 +104,7 @@ export const AddMemberModal: React.FC<Props> = ({
                     {/* Password Input */}
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Пароль <span className="text-red-500">*</span>
+                            Ваш пароль <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="password"
@@ -118,13 +118,13 @@ export const AddMemberModal: React.FC<Props> = ({
                     {/* Full Name Input */}
                     <div>
                         <label className="block text-sm font-medium mb-1">
-                            Полное имя (необязательно)
+                            Полное имя
                         </label>
                         <input
                             type="text"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            placeholder="Иван Иванов"
+                            placeholder="Жандос Базаркат"
                             className="w-full border rounded-lg p-2 text-sm"
                         />
                     </div>
@@ -134,17 +134,13 @@ export const AddMemberModal: React.FC<Props> = ({
                         <label className="block text-sm font-medium mb-1">
                             Роль
                         </label>
-                        <select
+                        <input
+                            type="text"
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
+                            placeholder="Роль"
                             className="w-full border rounded-lg p-2 text-sm"
-                        >
-                            <option value="member">Участник</option>
-                            <option value="admin">Администратор</option>
-                            <option value="developer">Разработчик</option>
-                            <option value="designer">Дизайнер</option>
-                            <option value="manager">Менеджер</option>
-                        </select>
+                        />
                     </div>
 
                     {/* Error Message */}

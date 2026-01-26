@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Mail, MapPin, Globe } from "lucide-react";
+import { Star, Mail, MapPin, Globe, Phone } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyCompanyProfile } from "@/hooks/useMyCompanyProfile";
 import type { CompanyMemberPublic } from "@/data/api/companies.api";
@@ -383,9 +383,26 @@ export const MyCompanyProfilePage = () => {
                   )
                 )}
 
+                {isEditing ? (
+                  <input
+                    value={formState.phone_number ?? ""}
+                    onChange={(e) =>
+                      setFormState((s) => ({ ...s, phone_number: e.target.value }))
+                    }
+                    className="w-full border rounded-lg p-2 text-sm"
+                    placeholder="Номер телефона"
+                  />
+                ) : (
+                  company.phone_number && (
+                    <div className="flex gap-2 items-center">
+                      <Phone size={16} /> {company.phone_number}
+                    </div>
+                  )
+                )}
+
                 {company.created_at && (
                   <div className="flex gap-2 items-center">
-                    <Globe size={16} /> Основана:{" "}
+                    <Globe size={16} /> В Enterra c:{" "}
                     {new Date(company.created_at).getFullYear()}
                   </div>
                 )}
