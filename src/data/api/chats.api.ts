@@ -80,6 +80,10 @@ export const chatsApi = {
         );
     },
 
+    deleteMessage(messageId: string) {
+        return api.delete(`${API_BASE}/messages/${messageId}`);
+    },
+
     /* -------- Deals -------- */
 
     createDeal(chatId: string, data: DealCreate) {

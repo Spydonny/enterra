@@ -84,7 +84,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
     phone: company?.phone_number ?? "—",
     address: company?.address ?? "—",
     founded: new Date(company.created_at).getFullYear() ?? "—",
-    tags: ["Услуги", "B2B"], // This field is not in the API response
+    tags: company?.tags ?? [], // This field is not in the API response
     achievements: ["Нет данных"], // This field is not in the API response
     description: company?.description ?? "",
   };
@@ -107,15 +107,21 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
 
           <div className="flex-1">
             <div className="text-xl font-semibold">{data.title}</div>
-            <div className="text-sm text-gray-500">{data.type}</div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="text-sm text-gray-500">{data.type}</div>
+              {data.tags?.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-blue-700"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* Buttons */}
-          {isYourSelf ? (
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow">
-              Редактировать профиль
-            </button>
-          ) : (
+          {(
             <div className="flex gap-2">
               <button
                 className="px-4 py-2 border border-gray-300 rounded-lg bg-white shadow-sm"
@@ -377,22 +383,6 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* Tags */}
-            <div className="bg-white rounded-xl shadow p-4">
-              <div className="font-semibold mb-3">Услуги</div>
-
-              <div className="flex flex-wrap gap-2">
-                {data.tags.map((tag: string) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 rounded-lg bg-gray-100 text-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
         </div>

@@ -14,10 +14,15 @@ export const MyCompanyProfilePage = () => {
   const { company, isLoading, error } = useMyCompanyProfile(user?.id);
   const [tab, setTab] = useState<"pub" | "cases" | "reviews">("pub");
   const [isEditing, setIsEditing] = useState(false);
-  const [formState, setFormState] = useState<CompanyUpdate>({});
+  const [formState, setFormState] = useState<CompanyUpdate>({ tags: [] });
   const [isSaving, setIsSaving] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [members, setMembers] = useState<CompanyMemberPublic[]>([]);
+  const tags = isEditing
+    ? formState.tags ?? []
+    : company?.tags ?? [];
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [newTag, setNewTag] = useState("");
 
 
   const handleEdit = () => {
@@ -28,27 +33,22 @@ export const MyCompanyProfilePage = () => {
       address: company.address ?? null,
       phone_number: company.phone_number ?? null,
       logo_url: company.logo_url ?? null,
+      tags: company.tags ?? [],   // ← ВАЖНО
     });
-    console.log(formState);
+
     setIsEditing(true);
   };
 
   const handleSave = async () => {
-    console.log("Saving", formState);
     try {
       setIsSaving(true);
-
-      const updatedCompany = await updateCompany(company.id, formState);
-      console.log("Updated company:", updatedCompany);
-
-
+      await updateCompany(company.id, formState);
       setIsEditing(false);
-    } catch (e) {
-      console.error(e);
     } finally {
       setIsSaving(false);
     }
   };
+
 
   const handleMemberAdded = (newMember: CompanyMemberPublic) => {
     setMembers((prev) => [...prev, newMember]);
@@ -80,9 +80,30 @@ export const MyCompanyProfilePage = () => {
 
           <div className="flex-1">
             <div className="text-xl font-semibold">{company.name}</div>
-            <div className="text-sm text-gray-500">
-              {company.type ?? "Компания"}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-gray-500">
+                {company.company_type ?? "Компания"}
+              </span>
+
+              {tags?.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700"
+                >
+                  {tag}
+                </span>
+              ))}
+
+              {isEditing && (
+                <button
+                  onClick={() => setIsTagModalOpen(true)}
+                  className="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 text-sm flex items-center justify-center"
+                >
+                  +
+                </button>
+              )}
             </div>
+
           </div>
 
           {/* Owner buttons */}
@@ -434,13 +455,57 @@ export const MyCompanyProfilePage = () => {
         </div>
       </div>
 
-      {/* Add Member Modal */}
+      {/* Modals */}
       <AddMemberModal
         open={isAddMemberModalOpen}
         onClose={() => setIsAddMemberModalOpen(false)}
         companyId={company.id}
         onMemberAdded={handleMemberAdded}
       />
+      {isTagModalOpen && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-80 shadow-lg">
+            <h3 className="font-semibold mb-3">Статус компании</h3>
+
+            <input
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              placeholder="Например: Свободен"
+              className="w-full border rounded-lg p-2 text-sm"
+            />
+
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => {
+                  setIsTagModalOpen(false);
+                  setNewTag("");
+                }}
+                className="text-sm text-gray-500"
+              >
+                Отмена
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!newTag.trim()) return;
+
+                  setFormState((s) => ({
+                    ...s,
+                    tags: [...(s.tags ?? []), newTag.trim()],
+                  }));
+
+                  setNewTag("");
+                  setIsTagModalOpen(false);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+              >
+                Добавить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

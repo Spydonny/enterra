@@ -17,6 +17,7 @@ export const Messages: React.FC = () => {
 
   // Chat metadata (user/company names)
   const [chatMetadata, setChatMetadata] = useState<Map<string, { title: string; subtitle?: string }>>(new Map());
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Contract modal state
   const [open, setOpen] = useState(false);
@@ -138,6 +139,40 @@ export const Messages: React.FC = () => {
       setIsSending(false);
     }
   }
+
+  // async function deleteMessage(id: string) {
+  //   try {
+  //     // optimistic UI
+  //     setMessages(prev => prev.filter(m => m.id !== id));
+
+  //     await chatsApi.deleteMessage(id);
+  //   } catch (err) {
+  //     console.error("Failed to delete message:", err);
+
+  //     // если ошибка — можно перезагрузить
+  //     const response = await chatsApi.getMessages(activeId, { skip: 0, limit: 100 });
+  //     setMessages(response.data.data);
+  //   }
+  // }
+
+  async function confirmDelete() {
+    if (!deleteId) return;
+
+    const id = deleteId;
+
+    setDeleteId(null);
+
+    try {
+      setMessages(prev => prev.filter(m => m.id !== id));
+      await chatsApi.deleteMessage(id);
+    } catch (err) {
+      console.error("Failed to delete message:", err);
+
+      const response = await chatsApi.getMessages(activeId, { skip: 0, limit: 100 });
+      setMessages(response.data.data);
+    }
+  }
+
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -271,7 +306,11 @@ export const Messages: React.FC = () => {
               ) : (
                 messages.map((msg) => {
                   const fromMe = msg.sender_id === currentUserId;
+
                   const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
                     hour: '2-digit',
                     minute: '2-digit'
                   });
@@ -279,26 +318,44 @@ export const Messages: React.FC = () => {
                   return (
                     <div
                       key={msg.id}
-                      className={`
-                        max-w-[65%] p-4 rounded-2xl shadow-sm
-                        ${fromMe
-                          ? "ml-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
-                          : "bg-white border border-gray-200/70 text-gray-800"
-                        }
-                      `}
+                      className={`group relative max-w-[65%]
+        ${fromMe ? "ml-auto" : ""}
+      `}
                     >
-                      <div className="text-[15px] whitespace-pre-wrap leading-relaxed">
-                        {msg.content}
-                      </div>
+                      {fromMe && (
+                        <button
+                          onClick={() => setDeleteId(msg.id)}
+                          className="
+            absolute -top-2 -right-2 opacity-0 group-hover:opacity-100
+            bg-white border shadow rounded-full w-7 h-7
+            text-xs hover:bg-red-50 transition
+          "
+                        >
+                          🗑
+                        </button>
+                      )}
+
                       <div
-                        className={`text-xs mt-2 ${fromMe ? "text-blue-100" : "text-gray-400"
-                          }`}
+                        className={`
+          p-4 rounded-2xl shadow-sm
+          ${fromMe
+                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
+                            : "bg-white border border-gray-200/70 text-gray-800"
+                          }
+        `}
                       >
-                        {time}
+                        <div className="text-[15px] whitespace-pre-wrap leading-relaxed">
+                          {msg.content}
+                        </div>
+
+                        <div className={`text-xs mt-2 ${fromMe ? "text-blue-100" : "text-gray-400"}`}>
+                          {time}
+                        </div>
                       </div>
                     </div>
                   );
                 })
+
               )}
               <div ref={messagesEndRef} />
             </div>
@@ -354,6 +411,51 @@ export const Messages: React.FC = () => {
         smsVerified={smsVerified}
         setSmsVerified={setSmsVerified}
       />
+
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div
+            className="
+        bg-white rounded-2xl shadow-2xl
+        w-[340px] p-6 space-y-5
+        animate-in fade-in zoom-in
+      "
+          >
+            <div className="text-lg font-semibold text-gray-900">
+              Удалить сообщение?
+            </div>
+
+            <div className="text-sm text-gray-500">
+              Это действие нельзя отменить.
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="
+            px-4 py-2 rounded-xl
+            bg-gray-100 hover:bg-gray-200
+            text-gray-700 transition
+          "
+              >
+                Отмена
+              </button>
+
+              <button
+                onClick={confirmDelete}
+                className="
+            px-4 py-2 rounded-xl
+            bg-red-600 hover:bg-red-700
+            text-white shadow-md transition
+          "
+              >
+                Удалить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

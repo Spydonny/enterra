@@ -110,7 +110,7 @@ export const Home: React.FC<Props> = ({
               className="
                 relative
                 w-[360px]
-                h-[220px]
+                h-[280px]
                 cursor-pointer
               "
             >

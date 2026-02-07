@@ -81,13 +81,17 @@ export const ChatListSkeleton: React.FC = () => {
 
 export const MessagesSkeleton: React.FC = () => {
     return (
-        <div className="space-y-5">
-            {[1, 2, 3, 4].map((i) => (
+        <div className="h-full flex flex-col gap-5">
+            {[1, 2, 3, 4].map((i, idx, arr) => (
                 <div
                     key={i}
-                    className={`max-w-[65%] ${i % 2 === 0 ? "ml-auto" : ""}`}
+                    className={`max-w-[65%] ${i % 2 === 0 ? "ml-auto" : ""
+                        } ${idx === arr.length - 1 ? "flex-1" : ""}`}
                 >
-                    <Skeleton className={`h-20 rounded-2xl ${i % 2 === 0 ? "w-64" : "w-80"}`} />
+                    <Skeleton
+                        className={`w-full rounded-2xl ${idx === arr.length - 1 ? "h-full" : "h-20"
+                            }`}
+                    />
                 </div>
             ))}
         </div>

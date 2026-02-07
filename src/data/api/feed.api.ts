@@ -1,19 +1,25 @@
 // src/api/feed.api.ts
 
-import { api } from "./http"; // axios instance
+import { api } from "./http";
 import type { UUID } from "@/types.d.ts";
 
-/* ========= TYPES ========= */
+/* =====================================================
+   TYPES
+===================================================== */
 
 export type Post = {
   id: UUID;
   author_id: UUID;
   company_id?: UUID | null;
+
   content: string;
   media_urls?: string | null;
+
   created_at: string;
+
   comments_count: number;
   reactions_count: number;
+  views_count: number; // 🔥 NEW
 };
 
 export type PostsResponse = {
@@ -30,75 +36,151 @@ export type CreateCommentPayload = {
   content: string;
 };
 
-export type ReactionType = "like" | string;
+/* ---------- analytics ---------- */
 
-/* ========= API ========= */
+export type PostAnalytics = {
+  views: number;
+  likes: number;
+  comments: number;
+};
 
-const API_BASE = "api/v1/feed";
+export type CompanyAnalytics = {
+  posts: number;
+  views: number;
+  likes: number;
+  comments: number;
+};
+
+export type PaginationParams = {
+  skip?: number;
+  limit?: number;
+};
+
+/* =====================================================
+   API BASE
+===================================================== */
+
+const API_BASE = "/api/v1/feed";
+
+/* =====================================================
+   API
+===================================================== */
 
 export const postsApi = {
-  /* ---- POSTS ---- */
+  /* =====================================================
+     POSTS
+  ===================================================== */
 
-  getPosts: async (params?: { skip?: number; limit?: number }) => {
-    const { data } = await api.get<PostsResponse>(`/${API_BASE}/posts`, {
+  getPosts: async (params?: PaginationParams) => {
+    const { data } = await api.get<PostsResponse>(`${API_BASE}/posts`, {
       params,
     });
     return data;
   },
 
-  createPost: async (payload: CreatePostPayload) => {
-    const { data } = await api.post<Post>(`/${API_BASE}/posts`, payload);
-    return data;
-  },
-
-  deletePost: async (postId: UUID) => {
-    const { data } = await api.delete<{ message: string }>(
-      `/${API_BASE}/posts/${postId}`
-    );
-    return data;
-  },
-
   getPostById: async (postId: UUID) => {
-    const { data } = await api.get<Post>(
-      `/${API_BASE}/posts/${postId}`
-    );
+    const { data } = await api.get<Post>(`${API_BASE}/posts/${postId}`);
     return data;
   },
 
   getCompanyPosts: async (
     companyId: UUID,
-    params?: { skip?: number; limit?: number }
+    params?: PaginationParams
   ) => {
     const { data } = await api.get<PostsResponse>(
-      `/${API_BASE}/posts/company/${companyId}`,
+      `${API_BASE}/posts/company/${companyId}`,
       { params }
     );
     return data;
   },
 
+  createPost: async (payload: CreatePostPayload) => {
+    const { data } = await api.post<Post>(`${API_BASE}/posts`, payload);
+    return data;
+  },
 
-  /* ---- COMMENTS ---- */
+  deletePost: async (postId: UUID) => {
+    const { data } = await api.delete<{ message: string }>(
+      `${API_BASE}/posts/${postId}`
+    );
+    return data;
+  },
+
+  /* =====================================================
+     COMMENTS
+  ===================================================== */
 
   createComment: async (
     postId: UUID,
     payload: CreateCommentPayload
   ) => {
     const { data } = await api.post(
-      `/${API_BASE}/posts/${postId}/comments`,
+      `${API_BASE}/posts/${postId}/comments`,
       payload
     );
     return data;
   },
 
-  /* ---- REACTIONS ---- */
+  /* =====================================================
+     ❤️ REACTIONS (LIKE TOGGLE)
+  ===================================================== */
 
-  reactToPost: async (
-    postId: UUID,
-    type: ReactionType = "like"
-  ) => {
+  /**
+   * Toggle like
+   * backend сам добавляет/удаляет
+   */
+  toggleLike: async (postId: UUID) => {
     const { data } = await api.post<{ message: string }>(
-      `/${API_BASE}/posts/${postId}/reactions`,
-      { type }
+      `${API_BASE}/posts/${postId}/reactions`
+    );
+    return data;
+  },
+
+  /* =====================================================
+     👁 VIEWS
+  ===================================================== */
+
+  /**
+   * Вызывать при открытии поста
+   */
+  registerView: async (postId: UUID) => {
+    await api.post(`${API_BASE}/posts/${postId}/view`);
+  },
+
+  /* =====================================================
+     📊 ANALYTICS
+  ===================================================== */
+
+  /**
+   * Аналитика поста за период
+   */
+  getPostAnalytics: async (
+    postId: UUID,
+    params: {
+      date_from: string; // ISO
+      date_to: string;
+    }
+  ) => {
+    const { data } = await api.get<PostAnalytics>(
+      `${API_BASE}/posts/${postId}/analytics`,
+      { params }
+    );
+    return data;
+  },
+
+  /**
+   * Аналитика компании
+   */
+  getCompanyAnalytics: async (
+    companyId: UUID,
+    params: {
+      date_from: string;
+      date_to: string;
+    }
+  ) => {
+    const { data } = await api.get<CompanyAnalytics>(
+      `${API_BASE}/companies/${companyId}/analytics`,
+      { params }
     );
     return data;
   },

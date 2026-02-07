@@ -16,6 +16,7 @@ export interface CompanyBase {
   address?: string | null;
   phone_number?: string | null;
   company_type?: string | null;
+  tags?: string[] | null;
 }
 
 export interface CompanyCreate extends CompanyBase { }
@@ -29,6 +30,7 @@ export interface CompanyUpdate {
   address?: string | null;
   phone_number?: string | null;
   company_type?: "startup" | "investor" | "contractor" | "executor" | null;
+  tags?: string[] | null;
 }
 
 export interface CompanyPublic extends CompanyBase {
