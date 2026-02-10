@@ -4,7 +4,7 @@ import { PostCard } from "@/pages/Feed";
 import { CreatePostModal } from "@/components/CreatePostModal";
 import type { CompanyPublic } from "@/data/api/companies.api";
 
-export const ProfilePost: React.FC<{ company: CompanyPublic, isYourCompany: boolean }> = ({ company, isYourCompany }) => {
+export const ProfilePost: React.FC<{ company: CompanyPublic, isYourCompany: boolean, onOpenPost?: (id: string) => void }> = ({ company, isYourCompany, onOpenPost }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export const ProfilePost: React.FC<{ company: CompanyPublic, isYourCompany: bool
       <div className="space-y-4">
         {posts.length ? (
           posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onOpenPost={onOpenPost} />
           ))
         ) : (
           <p className="text-sm text-gray-500 text-center">

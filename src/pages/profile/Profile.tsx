@@ -8,10 +8,11 @@ import { type CompanyMemberPublic } from "@/data/api/companies.api";
 interface ProfilePageProps {
   company_id: string;
   onMessage: (ownerId: string) => void;
+  onOpenPost?: (id: string) => void;
   isYourSelf?: boolean;
 }
 
-export function ProfilePage({ company_id, onMessage, isYourSelf = false }: ProfilePageProps) {
+export function ProfilePage({ company_id, onMessage, onOpenPost, isYourSelf = false }: ProfilePageProps) {
   const [tab, setTab] = useState("pub");
   const [company, setCompany] = useState<CompanyProfilePublic | null>(null);
   const [loading, setLoading] = useState(true);
@@ -160,7 +161,7 @@ export function ProfilePage({ company_id, onMessage, isYourSelf = false }: Profi
           {/* Left content */}
           <div className="flex-1 space-y-6">
             {tab === "pub" && (
-              <ProfilePost company={company} isYourCompany={false} />
+              <ProfilePost company={company} isYourCompany={false} onOpenPost={onOpenPost} />
             )}
             {tab === "cases" && (
               <div className="bg-white rounded-xl shadow p-4">

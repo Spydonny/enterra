@@ -9,7 +9,7 @@ import { ProfilePost } from "./ProfilePost";
 import { AddMemberModal } from "@/components/AddMemberModal";
 
 
-export const MyCompanyProfilePage = () => {
+export const MyCompanyProfilePage = ({ onOpenPost }: { onOpenPost?: (id: string) => void }) => {
   const { user } = useAuth();
   const { company, isLoading, error } = useMyCompanyProfile(user?.id);
   const [tab, setTab] = useState<"pub" | "cases" | "reviews">("pub");
@@ -159,7 +159,7 @@ export const MyCompanyProfilePage = () => {
           {/* Left content */}
           <div className="flex-1 space-y-6">
             {tab === "pub" && (
-              <ProfilePost company={company} isYourCompany={true} />
+              <ProfilePost company={company} isYourCompany={true} onOpenPost={onOpenPost} />
             )}
 
             {tab === "cases" && (
