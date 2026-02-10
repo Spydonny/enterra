@@ -14,7 +14,7 @@ import { likesStorage } from "@/utils/likesStorage";
    POST CARD
 ====================================================== */
 
-export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
+export const PostCard: React.FC<{ post: Post; onOpenPost?: (id: string) => void }> = ({ post, onOpenPost }) => {
   const [authorName, setAuthorName] = useState(
     `User ${post.author_id.slice(0, 6)}`
   );
@@ -82,7 +82,10 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
   ============================== */
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 max-w-[680px] mx-auto w-full">
+    <div
+      className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 max-w-[680px] mx-auto w-full cursor-pointer hover:shadow-md transition-shadow"
+      onClick={() => onOpenPost?.(post.id)}
+    >
       {/* HEADER */}
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
@@ -126,7 +129,7 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
       )}
 
       {/* FOOTER */}
-      <div className="mt-4 flex items-center gap-8 text-sm">
+      <div className="mt-4 flex items-center gap-8 text-sm" onClick={(e) => e.stopPropagation()}>
         {/* LIKE */}
         <button
           onClick={handleLike}
@@ -141,15 +144,21 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
         </button>
 
         {/* COMMENTS */}
-        <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition">
+        <button
+          onClick={() => onOpenPost?.(post.id)}
+          className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition"
+        >
           <MessageCircle size={18} />
           {post.comments_count}
         </button>
 
         {/* REPOST */}
-        <button className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition">
+        <button
+          onClick={() => onOpenPost?.(post.id)}
+          className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
+        >
           <Repeat2 size={18} />
-          0
+          Поделиться
         </button>
       </div>
     </div>
@@ -160,7 +169,7 @@ export const PostCard: React.FC<{ post: Post }> = ({ post }) => {
    FEED PAGE
 ====================================================== */
 
-export const Feed: React.FC = () => {
+export const Feed: React.FC<{ onOpenPost?: (id: string) => void }> = ({ onOpenPost }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -218,7 +227,7 @@ export const Feed: React.FC = () => {
           {posts.length === 0 ? (
             <div className="text-gray-500 text-sm">Пока нет постов</div>
           ) : (
-            posts.map((post) => <PostCard key={post.id} post={post} />)
+            posts.map((post) => <PostCard key={post.id} post={post} onOpenPost={onOpenPost} />)
           )}
         </div>
       )}

@@ -196,7 +196,7 @@ export const MyCompanyProfilePage = () => {
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-3">
                               {/* User Avatar */}
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                              <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                                 U
                               </div>
                               <div>
@@ -281,7 +281,7 @@ export const MyCompanyProfilePage = () => {
                         className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 bg-gradient-to-r from-gray-50 to-white"
                       >
                         {/* Avatar */}
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
                           {initials}
                         </div>
 

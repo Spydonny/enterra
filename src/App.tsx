@@ -2,6 +2,7 @@ import React from "react";
 import { Sidebar } from "./components/Sidebar";
 import { Home } from "./pages/main/Home";
 import { Feed } from "./pages/Feed";
+import { PostPage } from "./pages/PostPage";
 import { Messages } from "./pages/Messages";
 import { ProfilePage } from "./pages/profile/Profile";
 import { MyCompanyProfilePage } from "./pages/profile/MyProfilePage";
@@ -22,6 +23,12 @@ export const App: React.FC = () => {
 
 
   const [selectedCompanyId, setSelectedCompanyId] = React.useState<string>("");
+  const [selectedPostId, setSelectedPostId] = React.useState<string>("");
+
+  function openPost(postId: string) {
+    setSelectedPostId(postId);
+    setRoute("post");
+  }
 
   function openProfile(company_id: string) {
     setSelectedCompanyId(company_id);
@@ -145,7 +152,13 @@ export const App: React.FC = () => {
         )}
 
         {route === "feed" && (
-          <Feed
+          <Feed onOpenPost={openPost} />
+        )}
+
+        {route === "post" && (
+          <PostPage
+            postId={selectedPostId}
+            onBack={() => setRoute("feed")}
           />
         )}
 

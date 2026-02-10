@@ -32,6 +32,19 @@ export type CreatePostPayload = {
   media_urls?: string | null;
 };
 
+export type Comment = {
+  id: UUID;
+  post_id: UUID;
+  author_id: UUID;
+  content: string;
+  created_at: string;
+};
+
+export type CommentsResponse = {
+  data: Comment[];
+  count: number;
+};
+
 export type CreateCommentPayload = {
   content: string;
 };
@@ -110,11 +123,19 @@ export const postsApi = {
      COMMENTS
   ===================================================== */
 
+  getComments: async (postId: UUID, params?: PaginationParams) => {
+    const { data } = await api.get<CommentsResponse>(
+      `${API_BASE}/posts/${postId}/comments`,
+      { params }
+    );
+    return data;
+  },
+
   createComment: async (
     postId: UUID,
     payload: CreateCommentPayload
   ) => {
-    const { data } = await api.post(
+    const { data } = await api.post<Comment>(
       `${API_BASE}/posts/${postId}/comments`,
       payload
     );
