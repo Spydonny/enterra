@@ -1,12 +1,12 @@
 export type Company = {
-id: string;
-name: string;
-type: string;
-leader: string;
-tags: string[];
-ratingUsers: number;
-ratingEnterra: number;
-status: string;
+  id: string;
+  name: string;
+  type: string;
+  leader: string;
+  tags: string[];
+  ratingUsers: number;
+  ratingEnterra: number;
+  status: string;
 };
 
 
@@ -20,16 +20,17 @@ export type Post = {
   created_at: string;
   comments_count: number;
   reactions_count: number;
+  views_count: number;
 };
 
 
 
 export type Conversation = {
-id: string;
-title: string;
-subtitle?: string;
-unread?: number;
-messages: { fromMe: boolean; text: string; time: string }[];
+  id: string;
+  title: string;
+  subtitle?: string;
+  unread?: number;
+  messages: { fromMe: boolean; text: string; time: string }[];
 };
 
 export interface Token {

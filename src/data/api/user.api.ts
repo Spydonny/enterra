@@ -26,6 +26,11 @@ export async function createUser(
   return data;
 }
 
+export async function getUserByEmail(email: string): Promise<UserPublic> {
+  const { data } = await api.get<UserPublic>(`/${API_BASE}/users/by-email/${encodeURIComponent(email)}`);
+  return data;
+}
+
 export async function getMe(): Promise<UserPublic> {
   const { data } = await api.get<UserPublic>(`/${API_BASE}/users/me`);
   return data;

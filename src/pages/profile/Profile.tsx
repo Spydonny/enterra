@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Star, MapPin, Phone, Mail, Globe, Award, ChevronRight } from "lucide-react";
+import { Star, MapPin, Phone, Mail, Globe, Calendar, Briefcase, Hash } from "lucide-react";
 import { getCompany, createOrUpdateRating, type CompanyProfilePublic } from "@/data/api/companies.api";
 import { ProfilePost } from "./ProfilePost";
 import { RatingModal } from "@/components/RatingModal";
@@ -350,40 +350,79 @@ export function ProfilePage({ company_id, onMessage, onOpenPost, isYourSelf = fa
               <div className="font-semibold text-lg mb-2">О нас</div>
 
               <p className="text-sm text-gray-600 leading-relaxed">
-                {data.description || "Описание компании отсутствует."}
+                {company?.description || "Описание компании отсутствует."}
               </p>
 
-              <div className="mt-4 space-y-2 text-sm text-gray-700">
-                <div className="flex gap-2 items-center">
-                  <Mail size={16} /> {data.email}
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Phone size={16} /> {data.phone}
-                </div>
-                <div className="flex gap-2 items-center">
-                  <MapPin size={16} /> {data.address}
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Globe size={16} /> В Enterra с: {data.founded}
-                </div>
-              </div>
+              <div className="mt-4 space-y-3 text-sm text-gray-700">
+                {company?.business_since_year && (
+                  <div className="flex gap-3 items-center p-3 rounded-xl bg-gray-50">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <Calendar size={14} className="text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500">В бизнесе с</div>
+                      <div className="text-sm font-medium text-gray-900">{company.business_since_year} года</div>
+                    </div>
+                  </div>
+                )}
 
-              <button className="mt-3 text-blue-600 text-sm flex items-center gap-1">
-                Показать больше <ChevronRight size={16} />
-              </button>
+                {company?.business_area && (
+                  <div className="flex gap-3 items-center p-3 rounded-xl bg-gray-50">
+                    <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                      <Briefcase size={14} className="text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500">Сфера деятельности</div>
+                      <div className="text-sm font-medium text-gray-900">{company.business_area}</div>
+                    </div>
+                  </div>
+                )}
+
+                {company?.okeds && company.okeds.length > 0 && (
+                  <div className="p-3 rounded-xl bg-gray-50">
+                    <div className="flex gap-2 items-center mb-2">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                        <Hash size={14} className="text-indigo-600" />
+                      </div>
+                      <div className="text-xs text-gray-500">ОКЭДы</div>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 ml-10">
+                      {company.okeds.map((oked: string, i: number) => (
+                        <span key={i} className="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium">
+                          {oked}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {company?.email && (
+                  <div className="flex gap-2 items-center">
+                    <Mail size={16} /> {company.email}
+                  </div>
+                )}
+                {company?.phone_number && (
+                  <div className="flex gap-2 items-center">
+                    <Phone size={16} /> {company.phone_number}
+                  </div>
+                )}
+                {company?.address && (
+                  <div className="flex gap-2 items-center">
+                    <MapPin size={16} /> {company.address}
+                  </div>
+                )}
+                {company?.created_at && (
+                  <div className="flex gap-2 items-center">
+                    <Globe size={16} /> В Enterra с {new Date(company.created_at).getFullYear()}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Achievements */}
             <div className="bg-white rounded-xl shadow p-4">
               <div className="font-semibold text-lg mb-3">Достижения</div>
-
-              <ul className="space-y-2 text-sm text-gray-700">
-                {data.achievements.map((a: string, idx: number) => (
-                  <li key={idx} className="flex gap-2 items-center">
-                    <Award className="text-yellow-500" size={18} /> {a}
-                  </li>
-                ))}
-              </ul>
+              <div className="text-sm text-gray-500">Нет достижений</div>
             </div>
           </div>
         </div>

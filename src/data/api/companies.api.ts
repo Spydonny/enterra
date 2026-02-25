@@ -17,6 +17,9 @@ export interface CompanyBase {
   phone_number?: string | null;
   company_type?: string | null;
   tags?: string[] | null;
+  business_since_year?: number | null;
+  business_area?: string | null;
+  okeds?: string[] | null;
 }
 
 export interface CompanyCreate extends CompanyBase { }
@@ -29,8 +32,11 @@ export interface CompanyUpdate {
   email?: string | null;
   address?: string | null;
   phone_number?: string | null;
-  company_type?: "startup" | "investor" | "contractor" | "executor" | null;
+  company_type?: "startup" | "investor" | "contractor" | "customer" | null;
   tags?: string[] | null;
+  business_since_year?: number | null;
+  business_area?: string | null;
+  okeds?: string[] | null;
 }
 
 export interface CompanyPublic extends CompanyBase {

@@ -54,7 +54,7 @@ export const Home: React.FC<Props> = ({
             onClick={() => onNavigate("contractors")}
             className="bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-xl text-[15px] font-medium shadow-md transition-all"
           >
-            Найти исполнителя →
+            Бизнес и госучреждения →
           </button>
 
           <button

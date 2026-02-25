@@ -2,12 +2,12 @@ import type { Post } from "../types";
 import { formatPostTime } from "../utils/date";
 import { useEffect, useState } from "react";
 
-import { postsApi } from "@/data/api/feed.api";
+import { postsApi, type Comment } from "@/data/api/feed.api";
 import { getUserById } from "@/data/api/user.api";
 import { getCompany, type CompanyBase } from "@/data/api/companies.api";
 
 import { PostCardSkeleton } from "@/components/Skeleton";
-import { Heart, MessageCircle, Repeat2 } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Eye } from "lucide-react";
 import { likesStorage } from "@/utils/likesStorage";
 
 /* ======================================================
@@ -23,6 +23,9 @@ export const PostCard: React.FC<{ post: Post; onOpenPost?: (id: string) => void 
 
   const [likes, setLikes] = useState(post.reactions_count);
   const [liked, setLiked] = useState(likesStorage.has(post.id));
+
+  const [previewComments, setPreviewComments] = useState<Comment[]>([]);
+  const [commentAuthors, setCommentAuthors] = useState<Record<string, string>>({});
 
   /* =============================
      LOAD USER + COMPANY
@@ -41,7 +44,33 @@ export const PostCard: React.FC<{ post: Post; onOpenPost?: (id: string) => void 
   }, [post.author_id, post.company_id]);
 
   /* =============================
-     SYNC COUNTS (если список обновился)
+     LOAD PREVIEW COMMENTS (latest 2)
+  ============================== */
+
+  useEffect(() => {
+    if (post.comments_count > 0) {
+      postsApi.getComments(post.id, { skip: 0, limit: 3 })
+        .then((res) => {
+          const latest = res.data.slice(-2);
+          setPreviewComments(latest);
+
+          latest.forEach((c) => {
+            getUserById(c.author_id)
+              .then((u) => {
+                setCommentAuthors((prev) => ({
+                  ...prev,
+                  [c.author_id]: u.full_name ?? u.email,
+                }));
+              })
+              .catch(() => { });
+          });
+        })
+        .catch(() => { });
+    }
+  }, [post.id, post.comments_count]);
+
+  /* =============================
+     SYNC COUNTS
   ============================== */
 
   useEffect(() => {
@@ -129,38 +158,72 @@ export const PostCard: React.FC<{ post: Post; onOpenPost?: (id: string) => void 
       )}
 
       {/* FOOTER */}
-      <div className="mt-4 flex items-center gap-8 text-sm" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-4 flex items-center gap-6 text-sm" onClick={(e) => e.stopPropagation()}>
         {/* LIKE */}
         <button
           onClick={handleLike}
-          className={`flex items-center gap-2 font-medium transition
+          className={`flex items-center gap-1.5 font-medium transition-all duration-200
             ${liked
-              ? "text-red-500 scale-105"
-              : "text-gray-600 hover:text-red-500"
+              ? "text-red-500"
+              : "text-gray-500 hover:text-red-500"
             }`}
         >
-          <Heart size={18} fill={liked ? "currentColor" : "none"} />
-          {likes}
+          <Heart
+            size={18}
+            fill={liked ? "currentColor" : "none"}
+            className={liked ? "animate-[heartBeat_0.3s_ease-in-out]" : ""}
+          />
+          <span>{likes}</span>
         </button>
 
         {/* COMMENTS */}
         <button
           onClick={() => onOpenPost?.(post.id)}
-          className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition"
         >
           <MessageCircle size={18} />
-          {post.comments_count}
+          <span>{post.comments_count}</span>
         </button>
+
+        {/* VIEWS */}
+        <div className="flex items-center gap-1.5 text-gray-400">
+          <Eye size={16} />
+          <span>{post.views_count ?? 0}</span>
+        </div>
 
         {/* REPOST */}
         <button
           onClick={() => onOpenPost?.(post.id)}
-          className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
+          className="flex items-center gap-1.5 text-gray-500 hover:text-green-600 transition ml-auto"
         >
           <Repeat2 size={18} />
-          Поделиться
+          <span className="hidden sm:inline">Поделиться</span>
         </button>
       </div>
+
+      {/* INLINE COMMENTS PREVIEW (Instagram-style) */}
+      {previewComments.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          {post.comments_count > 2 && (
+            <button
+              onClick={() => onOpenPost?.(post.id)}
+              className="text-xs text-gray-400 hover:text-blue-500 transition mb-2"
+            >
+              Посмотреть все комментарии ({post.comments_count})
+            </button>
+          )}
+          <div className="space-y-2">
+            {previewComments.map((c) => (
+              <div key={c.id} className="text-sm">
+                <span className="font-semibold text-gray-900 mr-1.5">
+                  {commentAuthors[c.author_id] ?? `User ${c.author_id.slice(0, 6)}`}
+                </span>
+                <span className="text-gray-700">{c.content.length > 120 ? c.content.slice(0, 120) + "…" : c.content}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

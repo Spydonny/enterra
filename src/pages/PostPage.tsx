@@ -10,6 +10,7 @@ import {
     Link2,
     X,
     Check,
+    Eye,
 } from "lucide-react";
 
 import { postsApi, type Comment } from "@/data/api/feed.api";
@@ -447,33 +448,39 @@ export const PostPage: React.FC<PostPageProps> = ({ postId, onBack }) => {
                 )}
 
                 {/* Footer actions */}
-                <div className="mt-5 pt-4 border-t border-gray-100 flex items-center gap-8 text-sm">
+                <div className="mt-5 pt-4 border-t border-gray-100 flex items-center gap-6 text-sm">
                     {/* Like */}
                     <button
                         onClick={handleLike}
-                        className={`flex items-center gap-2 font-medium transition
+                        className={`flex items-center gap-1.5 font-medium transition-all duration-200
               ${liked
-                                ? "text-red-500 scale-105"
-                                : "text-gray-600 hover:text-red-500"
+                                ? "text-red-500"
+                                : "text-gray-500 hover:text-red-500"
                             }`}
                     >
                         <Heart size={18} fill={liked ? "currentColor" : "none"} />
-                        {likes}
+                        <span>{likes}</span>
                     </button>
 
                     {/* Comments */}
                     <button
                         onClick={() => commentInputRef.current?.focus()}
-                        className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition"
+                        className="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition"
                     >
                         <MessageCircle size={18} />
-                        {post.comments_count}
+                        <span>{post.comments_count}</span>
                     </button>
+
+                    {/* Views */}
+                    <div className="flex items-center gap-1.5 text-gray-400">
+                        <Eye size={16} />
+                        <span>{post.views_count ?? 0}</span>
+                    </div>
 
                     {/* Repost / Share */}
                     <button
                         onClick={() => setShowShare(true)}
-                        className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
+                        className="flex items-center gap-1.5 text-gray-500 hover:text-green-600 transition ml-auto"
                     >
                         <Repeat2 size={18} />
                         Поделиться

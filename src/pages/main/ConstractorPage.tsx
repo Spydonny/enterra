@@ -30,15 +30,15 @@ export const ContractorsPage: React.FC<Props> = ({ onContact, onBack }) => {
     loadCompanies();
   }, []);
 
-  const executors = companies.filter((c) => c.company_type === "executor");
+  const customers = companies.filter((c) => c.company_type === "customer");
   const contractors = companies.filter((c) => c.company_type === "contractor");
 
   return (
     <TwoTabsPage
-      title="Исполнители и Подрядчики"
-      tab1Label="Исполнители"
+      title="Бизнес и госучреждения"
+      tab1Label="Заказчики"
       tab2Label="Подрядчики"
-      tab1Data={executors}
+      tab1Data={customers}
       tab2Data={contractors}
       onContact={onContact}
       onBack={onBack}
