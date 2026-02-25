@@ -24,6 +24,8 @@ export interface ChatMessagePublic {
     sender_id: string;
     content: string;
     file_urls?: string | null;
+    is_delivered: boolean;
+    is_read: boolean;
     created_at: string;
 }
 
@@ -82,6 +84,10 @@ export const chatsApi = {
 
     deleteMessage(messageId: string) {
         return api.delete(`${API_BASE}/messages/${messageId}`);
+    },
+
+    markAsRead(chatId: string) {
+        return api.put(`${API_BASE}/${chatId}/messages/read`);
     },
 
     /* -------- Deals -------- */

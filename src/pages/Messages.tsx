@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { ContractModal } from "../components/ContractModel";
 import { chatsApi, type ChatPublic, type ChatMessagePublic } from "@/data/api/chats.api";
 import { getMe } from "@/data/api/user.api";
 import { getCompanyByOwnerID } from "@/data/api/companies.api";
 import { ChatListSkeleton, MessagesSkeleton } from "@/components/Skeleton";
+import { Check, CheckCheck, Trash2 } from "lucide-react";
 
 export const Messages: React.FC = () => {
   const [chats, setChats] = useState<ChatPublic[]>([]);
@@ -19,6 +20,9 @@ export const Messages: React.FC = () => {
   const [chatMetadata, setChatMetadata] = useState<Map<string, { title: string; subtitle?: string }>>(new Map());
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  // For re-rendering remaining time on delete buttons
+  const [, setTick] = useState(0);
+
   // Contract modal state
   const [open, setOpen] = useState(false);
   const [content, setContent] = useState(
@@ -30,6 +34,12 @@ export const Messages: React.FC = () => {
   const [smsVerified, setSmsVerified] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Tick every 30s so remaining-time labels update
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 30_000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Load current user
   useEffect(() => {
@@ -100,7 +110,7 @@ export const Messages: React.FC = () => {
     }
   }, [chats, currentUserId]);
 
-  // Load messages for active chat
+  // Load messages for active chat + mark as read
   useEffect(() => {
     async function loadMessages() {
       if (!activeId) return;
@@ -109,6 +119,9 @@ export const Messages: React.FC = () => {
         setIsLoadingMessages(true);
         const response = await chatsApi.getMessages(activeId, { skip: 0, limit: 100 });
         setMessages(response.data.data);
+
+        // Mark messages from the other user as read
+        await chatsApi.markAsRead(activeId).catch(() => { });
       } catch (err) {
         console.error("Failed to load messages:", err);
       } finally {
@@ -140,26 +153,25 @@ export const Messages: React.FC = () => {
     }
   }
 
-  // async function deleteMessage(id: string) {
-  //   try {
-  //     // optimistic UI
-  //     setMessages(prev => prev.filter(m => m.id !== id));
+  // Helper: minutes remaining for deletion
+  const getMinutesRemaining = useCallback((createdAt: string): number => {
+    const created = new Date(createdAt).getTime();
+    const now = Date.now();
+    const elapsed = (now - created) / (1000 * 60);
+    return Math.max(0, Math.ceil(30 - elapsed));
+  }, []);
 
-  //     await chatsApi.deleteMessage(id);
-  //   } catch (err) {
-  //     console.error("Failed to delete message:", err);
-
-  //     // если ошибка — можно перезагрузить
-  //     const response = await chatsApi.getMessages(activeId, { skip: 0, limit: 100 });
-  //     setMessages(response.data.data);
-  //   }
-  // }
+  const canDelete = useCallback(
+    (msg: ChatMessagePublic) => {
+      return msg.sender_id === currentUserId && getMinutesRemaining(msg.created_at) > 0;
+    },
+    [currentUserId, getMinutesRemaining]
+  );
 
   async function confirmDelete() {
     if (!deleteId) return;
 
     const id = deleteId;
-
     setDeleteId(null);
 
     try {
@@ -173,14 +185,42 @@ export const Messages: React.FC = () => {
     }
   }
 
-
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       sendMessage();
     }
   }
 
+  // Status indicator for sent messages
+  function MessageStatus({ msg }: { msg: ChatMessagePublic }) {
+    if (msg.sender_id !== currentUserId) return null;
+
+    if (msg.is_read) {
+      return (
+        <span className="inline-flex items-center ml-1.5" title="Прочитано">
+          <CheckCheck size={14} className="text-blue-400" />
+        </span>
+      );
+    }
+    if (msg.is_delivered) {
+      return (
+        <span className="inline-flex items-center ml-1.5" title="Доставлено">
+          <CheckCheck size={14} className="text-gray-300" />
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center ml-1.5" title="Отправлено">
+        <Check size={14} className="text-gray-300" />
+      </span>
+    );
+  }
+
   const activeMeta = chatMetadata.get(activeId) || { title: "Чат", subtitle: undefined };
+
+  // Find the message being deleted (for the modal)
+  const deletingMessage = deleteId ? messages.find(m => m.id === deleteId) : null;
+  const deleteMinutesLeft = deletingMessage ? getMinutesRemaining(deletingMessage.created_at) : 0;
 
   return (
     <div className="flex h-screen bg-[#f7f7f5]">
@@ -306,6 +346,8 @@ export const Messages: React.FC = () => {
               ) : (
                 messages.map((msg) => {
                   const fromMe = msg.sender_id === currentUserId;
+                  const deletable = canDelete(msg);
+                  const minutesLeft = getMinutesRemaining(msg.created_at);
 
                   const time = new Date(msg.created_at).toLocaleTimeString('ru-RU', {
                     year: 'numeric',
@@ -319,37 +361,41 @@ export const Messages: React.FC = () => {
                     <div
                       key={msg.id}
                       className={`group relative max-w-[65%]
-        ${fromMe ? "ml-auto" : ""}
-      `}
+                        ${fromMe ? "ml-auto" : ""}
+                      `}
                     >
-                      {fromMe && (
+                      {/* Delete button — only for sender, within 30 min */}
+                      {fromMe && deletable && (
                         <button
                           onClick={() => setDeleteId(msg.id)}
+                          title={`Удалить (осталось ${minutesLeft} мин)`}
                           className="
-            absolute -top-2 -right-2 opacity-0 group-hover:opacity-100
-            bg-white border shadow rounded-full w-7 h-7
-            text-xs hover:bg-red-50 transition
-          "
+                            absolute -top-2 -right-2 opacity-0 group-hover:opacity-100
+                            bg-white border border-gray-200 shadow-md rounded-full w-8 h-8
+                            flex items-center justify-center
+                            hover:bg-red-50 hover:border-red-200 transition-all duration-200
+                          "
                         >
-                          🗑
+                          <Trash2 size={13} className="text-gray-500 hover:text-red-500" />
                         </button>
                       )}
 
                       <div
                         className={`
-          p-4 rounded-2xl shadow-sm
-          ${fromMe
+                          p-4 rounded-2xl shadow-sm
+                          ${fromMe
                             ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md"
                             : "bg-white border border-gray-200/70 text-gray-800"
                           }
-        `}
+                        `}
                       >
                         <div className="text-[15px] whitespace-pre-wrap leading-relaxed">
                           {msg.content}
                         </div>
 
-                        <div className={`text-xs mt-2 ${fromMe ? "text-blue-100" : "text-gray-400"}`}>
-                          {time}
+                        <div className={`flex items-center gap-0.5 text-xs mt-2 ${fromMe ? "text-blue-100 justify-end" : "text-gray-400"}`}>
+                          <span>{time}</span>
+                          <MessageStatus msg={msg} />
                         </div>
                       </div>
                     </div>
@@ -412,31 +458,47 @@ export const Messages: React.FC = () => {
         setSmsVerified={setSmsVerified}
       />
 
+      {/* Delete confirmation modal */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <div
             className="
-        bg-white rounded-2xl shadow-2xl
-        w-[340px] p-6 space-y-5
-        animate-in fade-in zoom-in
-      "
+              bg-white rounded-2xl shadow-2xl
+              w-[380px] p-6 space-y-5
+              animate-in fade-in zoom-in
+            "
           >
-            <div className="text-lg font-semibold text-gray-900">
-              Удалить сообщение?
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                <Trash2 size={18} className="text-red-600" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold text-gray-900">
+                  Удалить сообщение?
+                </div>
+                <div className="text-sm text-gray-500">
+                  Это действие нельзя отменить.
+                </div>
+              </div>
             </div>
 
-            <div className="text-sm text-gray-500">
-              Это действие нельзя отменить.
-            </div>
+            {deleteMinutesLeft > 0 && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-xs text-amber-700">
+                  Осталось {deleteMinutesLeft} мин для удаления
+                </span>
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setDeleteId(null)}
                 className="
-            px-4 py-2 rounded-xl
-            bg-gray-100 hover:bg-gray-200
-            text-gray-700 transition
-          "
+                  px-4 py-2 rounded-xl
+                  bg-gray-100 hover:bg-gray-200
+                  text-gray-700 transition
+                "
               >
                 Отмена
               </button>
@@ -444,10 +506,10 @@ export const Messages: React.FC = () => {
               <button
                 onClick={confirmDelete}
                 className="
-            px-4 py-2 rounded-xl
-            bg-red-600 hover:bg-red-700
-            text-white shadow-md transition
-          "
+                  px-4 py-2 rounded-xl
+                  bg-red-600 hover:bg-red-700
+                  text-white shadow-md transition
+                "
               >
                 Удалить
               </button>
