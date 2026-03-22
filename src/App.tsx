@@ -12,9 +12,11 @@ import { StartupInvestorPage } from "./pages/main/StartupInvestorPage";
 import { Login } from "./pages/auth/Login";
 import { Register } from "./pages/auth/Register";
 import { CreateCompany } from "./pages/auth/CreateCompanies";
+import { AdminStats } from "./pages/admin/AdminStats";
 
 import { getMe } from "./data/api/user.api";
 import { chatsApi } from "./data/api/chats.api";
+import { useActivityTracker } from "./hooks/useActivityTracker";
 
 export const App: React.FC = () => {
   const [route, setRoute] = React.useState<string>("login");
@@ -123,6 +125,8 @@ export const App: React.FC = () => {
     );
   }
 
+  // Activity tracking
+  useActivityTracker(route);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -177,6 +181,8 @@ export const App: React.FC = () => {
         )}
 
         {route === "docs" && <Documents />}
+
+        {route === "admin-stats" && <AdminStats />}
       </main>
     </div>
   );

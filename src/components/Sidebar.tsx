@@ -5,13 +5,18 @@ import {
   MessageSquare,
   // FileText,
   Settings,
-  UserRound
+  UserRound,
+  BarChart3
 } from "lucide-react";
 
 import { logout } from "@/data/api/auth.api";
 import { getMe } from "@/data/api/user.api";
 import { getCompanyByOwnerID } from "@/data/api/companies.api";
 import type { UserPublic, CompanyProfilePublic } from "@/data/api/companies.api";
+
+interface UserPublicExtended extends UserPublic {
+  is_superuser?: boolean;
+}
 
 type SidebarProps = { 
   route: string; 
@@ -28,7 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const settingsRef = useRef<HTMLDivElement>(null);
 
   // 🔽 добавлено (логика)
-  const [user, setUser] = useState<UserPublic | null>(null);
+  const [user, setUser] = useState<UserPublicExtended | null>(null);
   const [company, setCompany] = useState<CompanyProfilePublic | null>(null);
 
   const items = [
@@ -38,6 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { key: "messages", label: "Сообщения", icon: <MessageSquare size={18} /> },
     // { key: "docs", label: "Документы", icon: <FileText size={18} /> },
   ];
+
+  const isAdmin = user?.is_superuser === true;
 
   // закрывать по клику вне
   useEffect(() => {
@@ -161,6 +168,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+
+        {/* Admin-only nav */}
+        {isAdmin && (
+          <button
+            onClick={() => onNavigate("admin-stats")}
+            className={`
+              w-full flex items-center gap-3 px-4 py-3 rounded-lg
+              text-left text-[15px] tracking-wide transition-all duration-150
+              ${
+                route === "admin-stats"
+                  ? "bg-indigo-50 text-indigo-700 font-semibold"
+                  : "text-gray-700 hover:bg-gray-100/60"
+              }
+            `}
+          >
+            <BarChart3 size={18} />
+            Статистика
+          </button>
+        )}
       </nav>
     </aside>
   );
