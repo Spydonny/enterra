@@ -41,20 +41,28 @@ export interface DauPoint {
   count: number;
 }
 
+export type Period = "day" | "week" | "month" | "year" | "all";
+
 /* ─── API functions ─── */
 
-export async function getOverview(): Promise<PlatformOverview> {
-  const { data } = await api.get<PlatformOverview>(`${API_BASE}/overview`);
+export async function getOverview(period: Period = "month"): Promise<PlatformOverview> {
+  const { data } = await api.get<PlatformOverview>(`${API_BASE}/overview`, {
+    params: { period },
+  });
   return data;
 }
 
-export async function getUsersStats(): Promise<UsersStatsResponse> {
-  const { data } = await api.get<UsersStatsResponse>(`${API_BASE}/users`);
+export async function getUsersStats(period: Period = "month"): Promise<UsersStatsResponse> {
+  const { data } = await api.get<UsersStatsResponse>(`${API_BASE}/users`, {
+    params: { period },
+  });
   return data;
 }
 
-export async function getSectionClicks(): Promise<SectionClickStats[]> {
-  const { data } = await api.get<SectionClickStats[]>(`${API_BASE}/sections`);
+export async function getSectionClicks(period: Period = "all"): Promise<SectionClickStats[]> {
+  const { data } = await api.get<SectionClickStats[]>(`${API_BASE}/sections`, {
+    params: { period },
+  });
   return data;
 }
 

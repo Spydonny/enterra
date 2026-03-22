@@ -75,6 +75,9 @@ export const App: React.FC = () => {
     checkAuth();
   }, []);
 
+  // Activity tracking (must be before any early returns per Rules of Hooks)
+  useActivityTracker(route);
+
   if (isAuth === null) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
@@ -124,9 +127,6 @@ export const App: React.FC = () => {
       />
     );
   }
-
-  // Activity tracking
-  useActivityTracker(route);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
