@@ -18,8 +18,8 @@ interface UserPublicExtended extends UserPublic {
   is_superuser?: boolean;
 }
 
-type SidebarProps = { 
-  route: string; 
+type SidebarProps = {
+  route: string;
   onNavigate: (r: string) => void;
   isLoggedIn?: boolean;
 };
@@ -102,7 +102,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/*Company name */}
           <div className="text-xs text-gray-500">
             {company?.name ?? "Компания не создана"}
-          </div> 
+          </div>
         </div>
 
         {/* Settings button + popover */}
@@ -149,6 +149,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <nav className="flex-1 p-3 space-y-1">
         {items.map((it) => {
           const active = route === it.key;
+
+          if (
+            isAdmin &&
+            (it.key === "profile-me" || it.key === "messages")
+          ) {
+            return null;
+          }
+
           return (
             <button
               key={it.key}
@@ -156,10 +164,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={`
                 w-full flex items-center gap-3 px-4 py-3 rounded-lg
                 text-left text-[15px] tracking-wide transition-all duration-150
-                ${
-                  active
-                    ? "bg-gray-100 text-gray-900 font-semibold"
-                    : "text-gray-700 hover:bg-gray-100/60"
+                ${active
+                  ? "bg-gray-100 text-gray-900 font-semibold"
+                  : "text-gray-700 hover:bg-gray-100/60"
                 }
               `}
             >
@@ -168,7 +175,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
-
         {/* Admin-only nav */}
         {isAdmin && (
           <button
@@ -176,10 +182,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className={`
               w-full flex items-center gap-3 px-4 py-3 rounded-lg
               text-left text-[15px] tracking-wide transition-all duration-150
-              ${
-                route === "admin-stats"
-                  ? "bg-indigo-50 text-indigo-700 font-semibold"
-                  : "text-gray-700 hover:bg-gray-100/60"
+              ${route === "admin-stats"
+                ? "bg-indigo-50 text-indigo-700 font-semibold"
+                : "text-gray-700 hover:bg-gray-100/60"
               }
             `}
           >
